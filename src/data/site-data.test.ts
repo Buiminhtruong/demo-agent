@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { proxyTypes } from './site-data'
+import { proxyTypes, shop } from './site-data'
 
 describe('site-data', () => {
   it('có 3 loại proxy, mỗi loại 3 gói', () => {
@@ -18,5 +18,9 @@ describe('site-data', () => {
       expect(popular).toHaveLength(1)
       expect(popular[0].code.endsWith('-30D')).toBe(true)
     }
+  })
+
+  it('shop có mô tả không rỗng', () => {
+    expect(shop.description.length).toBeGreaterThan(0)
   })
 })

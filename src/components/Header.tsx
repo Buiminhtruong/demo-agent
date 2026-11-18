@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import type { contactLinks } from '../lib/contact-links'
 
 type Props = { shopName: string; links: ReturnType<typeof contactLinks> }

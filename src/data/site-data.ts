@@ -23,6 +23,7 @@ export type Contact = { zalo: string; telegram: string; phone: string }
 export type Shop = {
   name: string
   tagline: string
+  description: string
   supportHours: string
   highlights: string[]
 }
@@ -30,6 +31,8 @@ export type Shop = {
 export const shop: Shop = {
   name: 'ProxyViet',
   tagline: 'Proxy & IP riêng tốc độ cao, giá rẻ',
+  description:
+    'IPv4 riêng, IPv6 và proxy dân cư cho nuôi tài khoản, chạy quảng cáo, thu thập dữ liệu. Nhắn là có proxy trong vài phút.',
   supportHours: '8h–22h mỗi ngày',
   highlights: ['IP riêng, không dùng chung', 'Hỗ trợ 8h–22h mỗi ngày', 'Đổi IP nếu lỗi trong 24h'],
 }

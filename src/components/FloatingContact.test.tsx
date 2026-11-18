@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import FloatingContact from './FloatingContact'
 
@@ -8,5 +8,6 @@ describe('FloatingContact', () => {
     const a = screen.getByRole('link', { name: 'Nhắn Zalo' })
     expect(a).toHaveAttribute('href', 'https://zalo.me/1')
     expect(a).toHaveAttribute('target', '_blank')
+    expect(a).toHaveAttribute('rel', 'noopener noreferrer')
   })
 })
