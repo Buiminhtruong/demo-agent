@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.auto-mode
+redmine-watch.log
+.notes-worktree/
+docs/superpowers/
+knowledge/
+tools/
+worklog.md
