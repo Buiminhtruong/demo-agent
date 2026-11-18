@@ -53,7 +53,7 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 .hero .btn-tg { background: transparent; color: #fff; border-color: #fff; }
 .points { display: flex; gap: 24px; margin-top: 28px; flex-wrap: wrap; font-size: 15px; }
 
-.type-card { display: block; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.type-card { display: flex; flex-direction: column; justify-content: flex-start; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
 .type-card:hover { border-color: var(--primary); }
 .card h3 { margin: 0 0 6px; }
 .type-name { display: block; font-size: 1.17em; font-weight: 700; margin: 0 0 6px; }
