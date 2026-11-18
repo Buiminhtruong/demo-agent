@@ -75,6 +75,10 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 .plan ul { padding-left: 18px; color: var(--muted); flex: 1; }
 .plan .btn-zalo { text-align: center; }
 .plan .alt { text-align: center; margin-top: 8px; font-size: 14px; color: var(--tg); }
+.copy-msg { margin-top: 10px; padding: 8px 12px; border: 1px dashed var(--line); border-radius: 8px; background: #fff; color: var(--text); font: inherit; font-size: 14px; cursor: pointer; }
+.copy-msg:hover { border-color: var(--primary); color: var(--primary-dark); }
+.copy-msg.copied { border-style: solid; border-color: #16a34a; color: #15803d; background: #f0fdf4; }
+.copy-msg.failed { border-style: solid; border-color: #d97706; color: #b45309; background: #fffbeb; }
 .note { text-align: center; color: var(--muted); margin-top: 20px; font-size: 14px; }
 
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }

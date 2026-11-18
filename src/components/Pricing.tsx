@@ -1,6 +1,8 @@
-import type { ProxyType } from '../data/site-data'
+import { orderMessageTemplate, type ProxyType } from '../data/site-data'
 import type { contactLinks } from '../lib/contact-links'
 import { formatPrice } from '../lib/format-price'
+import { orderMessage } from '../lib/order-message'
+import CopyMessageButton from './CopyMessageButton'
 
 type Props = {
   types: ProxyType[]
@@ -49,6 +51,7 @@ export default function Pricing({ types, selectedId, onSelect, links }: Props) {
               </ul>
               <a className="btn btn-zalo" href={links.zalo} target="_blank" rel="noopener noreferrer">Mua qua Zalo</a>
               <a className="alt" href={links.telegram} target="_blank" rel="noopener noreferrer">hoặc Telegram</a>
+              <CopyMessageButton message={orderMessage(orderMessageTemplate, selected, p)} code={p.code} />
             </div>
           ))}
         </div>

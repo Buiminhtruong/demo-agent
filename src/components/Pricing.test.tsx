@@ -51,6 +51,29 @@ describe('Pricing', () => {
     }
   })
 
+  it('mỗi gói có nút Copy tin nhắn mẫu; bấm thì chép đúng câu của gói và báo đã chép', async () => {
+    const user = userEvent.setup()
+    const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
+    render(<Pricing types={proxyTypes} selectedId="ipv4" onSelect={() => {}} links={links} />)
+    const buttons = screen.getAllByRole('button', { name: /Copy tin nhắn mẫu/ })
+    expect(buttons).toHaveLength(3)
+    await user.click(buttons[2])
+    expect(writeText).toHaveBeenCalledWith(
+      'Chào shop, mình muốn mua gói V4-30D (IPv4 riêng – Gói 30 ngày, 120.000đ/IP). Số lượng: ... IP',
+    )
+    expect(await screen.findByRole('button', { name: /Đã chép/ })).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /Copy tin nhắn mẫu/ })).toHaveLength(2)
+  })
+
+  it('chép thất bại thì báo khách gõ mã gói', async () => {
+    const user = userEvent.setup()
+    vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(new Error('denied'))
+    document.execCommand = vi.fn().mockReturnValue(false)
+    render(<Pricing types={proxyTypes} selectedId="ipv4" onSelect={() => {}} links={links} />)
+    await user.click(screen.getAllByRole('button', { name: /Copy tin nhắn mẫu/ })[0])
+    expect(await screen.findByRole('button', { name: /Không chép được.*V4-1D/ })).toBeInTheDocument()
+  })
+
   it('có dòng nhắc gửi mã gói', () => {
     render(<Pricing types={proxyTypes} selectedId="ipv4" onSelect={() => {}} links={links} />)
     expect(
