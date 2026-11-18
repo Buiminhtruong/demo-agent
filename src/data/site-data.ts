@@ -1,3 +1,4 @@
+// DỮ LIỆU MẪU — giá, số Zalo/Telegram/điện thoại là giả, thay trước khi chạy thật
 export type Plan = {
   code: string
   name: string
@@ -33,6 +34,7 @@ export const shop: Shop = {
   highlights: ['IP riêng, không dùng chung', 'Hỗ trợ 8h–22h mỗi ngày', 'Đổi IP nếu lỗi trong 24h'],
 }
 
+// DỮ LIỆU MẪU: số liên hệ giả, thay bằng thông tin thật
 export const contact: Contact = {
   zalo: '0900 000 000',
   telegram: '@proxyviet_demo',
