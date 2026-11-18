@@ -77,10 +77,27 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 .plan .alt { text-align: center; margin-top: 8px; font-size: 14px; color: var(--tg); }
 .note { text-align: center; color: var(--muted); margin-top: 20px; font-size: 14px; }
 
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.step-n { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-bottom: 10px; }
+
+.faq { max-width: 760px; margin: 0 auto; }
+.faq-item { border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; background: #fff; }
+.faq-q { display: block; width: 100%; text-align: left; font: inherit; font-weight: 600; color: var(--text); background: none; border: 0; padding: 0; cursor: pointer; }
+.faq-a { color: var(--muted); margin: 10px 0 0; }
+
+.site-footer { background: #0f172a; color: #cbd5e1; padding: 40px 0 20px; scroll-margin-top: 64px; }
+.site-footer .cols { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 24px; }
+.site-footer h4 { color: #fff; margin: 0 0 10px; }
+.site-footer p { margin: 0; }
+.site-footer ul { list-style: none; margin: 0; padding: 0; }
+.site-footer li { margin-bottom: 4px; }
+.site-footer a:hover { color: #fff; text-decoration: underline; }
+.site-footer .copy { border-top: 1px solid #1e293b; margin-top: 28px; padding-top: 16px; font-size: 13px; text-align: center; }
+
 .float { display: none; position: fixed; right: 16px; bottom: 16px; width: 56px; height: 56px; border-radius: 50%; background: var(--zalo); color: #fff; font-weight: 800; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,.25); font-size: 14px; }
 
 @media (max-width: 767px) {
-  .grid3 { grid-template-columns: 1fr; }
+  .grid3, .steps, .site-footer .cols { grid-template-columns: 1fr; }
   .header-zalo { display: none; }
   .burger { display: block; }
   .site-header nav { display: none; position: absolute; top: 64px; left: 0; right: 0; background: #fff; border-bottom: 1px solid var(--line); flex-direction: column; padding: 8px 16px; }
