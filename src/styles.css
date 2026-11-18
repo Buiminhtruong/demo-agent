@@ -56,8 +56,11 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 .type-card { display: block; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
 .type-card:hover { border-color: var(--primary); }
 .card h3 { margin: 0 0 6px; }
-.use { color: var(--muted); margin: 0; }
-.from { color: var(--primary); font-weight: 700; margin-top: 10px; }
+.type-name { display: block; font-size: 1.17em; font-weight: 700; margin: 0 0 6px; }
+.type-desc { display: block; margin: 1em 0; }
+.use { display: block; color: var(--muted); margin: 0; }
+.from { display: block; color: var(--primary); font-weight: 700; margin-top: 10px; }
+.duration { align-self: flex-start; color: var(--muted); font-size: 14px; margin-top: 6px; }
 
 .alt-bg { background: #fff; }
 .tabs { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }

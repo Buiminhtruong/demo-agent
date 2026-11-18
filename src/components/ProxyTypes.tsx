@@ -13,10 +13,10 @@ export default function ProxyTypes({ types, onSelect }: Props) {
         <div className="grid3">
           {types.map((t) => (
             <button key={t.id} type="button" className="card type-card" onClick={() => onSelect(t.id)}>
-              <h3>{t.name}</h3>
-              <p>{t.description}</p>
-              <p className="use">Dùng cho: {t.useCases}</p>
-              {t.plans.length > 0 && <div className="from">từ {formatPrice(minPrice(t))}</div>}
+              <span className="type-name">{t.name}</span>
+              <span className="type-desc">{t.description}</span>
+              <span className="use">Dùng cho: {t.useCases}</span>
+              {t.plans.length > 0 && <span className="from">từ {formatPrice(minPrice(t))}</span>}
             </button>
           ))}
         </div>

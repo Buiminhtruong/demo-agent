@@ -30,6 +30,7 @@ describe('Pricing', () => {
     expect(screen.getAllByRole('link', { name: 'Mua qua Zalo' })).toHaveLength(3)
     for (const p of type.plans) {
       expect(screen.getByText(p.code)).toBeInTheDocument()
+      expect(screen.getByText(`Thời hạn: ${p.duration}`)).toBeInTheDocument()
       expect(screen.getByText(formatPrice(p.price), { exact: false })).toBeInTheDocument()
     }
     expect(screen.getByText('V4-30D')).toBeInTheDocument()

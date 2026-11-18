@@ -38,6 +38,7 @@ export default function Pricing({ types, selectedId, onSelect, links }: Props) {
               {p.popular && <span className="badge">Phổ biến</span>}
               <h3>{p.name}</h3>
               <span className="code">{p.code}</span>
+              <span className="duration">Thời hạn: {p.duration}</span>
               <div className="price">
                 {formatPrice(p.price)} <small>/ 1 IP</small>
               </div>

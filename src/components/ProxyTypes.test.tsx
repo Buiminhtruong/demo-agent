@@ -28,7 +28,7 @@ describe('ProxyTypes', () => {
     const empty = [{ ...proxyTypes[0], plans: [] }]
     render(<ProxyTypes types={empty} onSelect={() => {}} />)
     expect(screen.getByText(empty[0].name)).toBeInTheDocument()
-    expect(screen.queryByText(/từ/)).toBeNull()
+    expect(screen.queryByText(/^từ \d/)).toBeNull()
     expect(screen.queryByText(/Infinity/)).toBeNull()
   })
 })
