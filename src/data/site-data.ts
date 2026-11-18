@@ -44,6 +44,10 @@ export const contact: Contact = {
   phone: '0900 000 000',
 }
 
+// Câu khách chép khi bấm "Copy tin nhắn mẫu" ở mỗi gói.
+// {code} = mã gói, {type} = loại proxy, {plan} = tên gói, {price} = giá
+export const orderMessageTemplate = 'Chào shop, mình muốn mua gói {code} ({type} – {plan}, {price}/IP). Số lượng: ... IP'
+
 const base = ['HTTP & SOCKS5', 'Băng thông không giới hạn']
 
 export const proxyTypes: ProxyType[] = [
