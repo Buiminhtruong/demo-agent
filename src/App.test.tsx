@@ -31,4 +31,22 @@ describe('App', () => {
     const target = scrollIntoView.mock.contexts[0] as HTMLElement
     expect(target.id).toBe('bang-gia')
   })
+
+  it('bấm "Xem giá IPv6" ở bảng so sánh chọn tab IPv6 và cuộn tới bảng giá', async () => {
+    const { container } = render(<App />)
+    const section = container.querySelector('#so-sanh') as HTMLElement
+    await userEvent.click(within(section).getAllByRole('button', { name: 'Xem giá IPv6' })[0])
+    expect(screen.getByRole('tab', { name: 'IPv6' })).toHaveAttribute('aria-selected', 'true')
+    const target = scrollIntoView.mock.contexts[0] as HTMLElement
+    expect(target.id).toBe('bang-gia')
+  })
+
+  it('các phần mới nằm đúng thứ tự trên trang', () => {
+    const { container } = render(<App />)
+    const ids = Array.from(container.querySelectorAll('main > section')).map((s) => s.id)
+    expect(ids.indexOf('so-sanh')).toBe(ids.indexOf('loai-proxy') + 1)
+    expect(ids.indexOf('bang-gia')).toBe(ids.indexOf('so-sanh') + 1)
+    expect(ids.indexOf('danh-gia')).toBe(ids.indexOf('bang-gia') + 1)
+    expect(ids.indexOf('cach-mua')).toBe(ids.indexOf('danh-gia') + 1)
+  })
 })

@@ -3,7 +3,14 @@ import { minPrice } from './min-price'
 import type { Plan, ProxyType } from '../data/site-data'
 
 const p: Plan = { code: 'X-1D', name: 'Gói', duration: '1 ngày', price: 1, features: [] }
-const type: ProxyType = { id: 'x', name: 'X', description: '', useCases: '', plans: [] }
+const type: ProxyType = {
+  id: 'x',
+  name: 'X',
+  description: '',
+  useCases: '',
+  compare: { ip: '', stability: { text: '', good: true }, support: { text: '', good: true } },
+  plans: [],
+}
 
 describe('minPrice', () => {
   it('trả về giá thấp nhất dù gói không theo thứ tự giá', () => {

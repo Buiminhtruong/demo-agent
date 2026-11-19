@@ -5,7 +5,9 @@ type Props = { shopName: string; links: ReturnType<typeof contactLinks> }
 
 const menu = [
   { href: '#loai-proxy', label: 'Loại proxy' },
+  { href: '#so-sanh', label: 'So sánh' },
   { href: '#bang-gia', label: 'Bảng giá' },
+  { href: '#danh-gia', label: 'Đánh giá' },
   { href: '#cach-mua', label: 'Cách mua' },
   { href: '#hoi-dap', label: 'Hỏi đáp' },
   { href: '#lien-he', label: 'Liên hệ' },
