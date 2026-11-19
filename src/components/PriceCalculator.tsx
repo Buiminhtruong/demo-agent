@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { calcMessageTemplate, type Plan, type ProxyType } from '../data/site-data'
+import { calcMessageTemplate, type Plan, type Promo, type ProxyType } from '../data/site-data'
+import { withPromoCode } from '../lib/promo'
 import type { contactLinks } from '../lib/contact-links'
 import { formatPrice } from '../lib/format-price'
 import { MAX_QUANTITY, parseQuantity, quoteMessage } from '../lib/price-calc'
@@ -10,13 +11,14 @@ type Props = {
   selectedId: string
   onSelect: (id: string) => void
   links: ReturnType<typeof contactLinks>
+  promo?: Promo | null
 }
 
 function popularPlan(type: ProxyType | undefined): Plan | undefined {
   return type?.plans.find((p) => p.popular) ?? type?.plans[0]
 }
 
-export default function PriceCalculator({ types, selectedId, onSelect, links }: Props) {
+export default function PriceCalculator({ types, selectedId, onSelect, links, promo = null }: Props) {
   const type = types.find((t) => t.id === selectedId) ?? types[0]
   // Nhớ thời hạn theo tên (vd "7 ngày") để đổi loại proxy vẫn giữ cùng thời hạn;
   // loại mới không có thời hạn đó thì dùng gói phổ biến của loại đó
@@ -82,7 +84,7 @@ export default function PriceCalculator({ types, selectedId, onSelect, links }: 
         <a className="btn btn-zalo" href={links.zalo} target="_blank" rel="noopener noreferrer">Mua qua Zalo</a>
         <CopyMessageButton
           key={`${plan.code}-${qtyText}`} // gói/số lượng đổi thì nút về trạng thái ban đầu, không báo "Đã chép" câu cũ
-          message={qty === null ? '' : quoteMessage(calcMessageTemplate, type, plan, qty)}
+          message={qty === null ? '' : withPromoCode(quoteMessage(calcMessageTemplate, type, plan, qty), promo, new Date())}
           code={plan.code}
           label="📋 Copy tin nhắn"
           disabled={qty === null}
