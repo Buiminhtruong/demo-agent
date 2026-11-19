@@ -64,6 +64,28 @@ describe('RegisterPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Email đã được sử dụng');
   });
 
+  it('mật khẩu quá 72 byte (25 chữ có dấu) → báo lỗi, không gửi', async () => {
+    const fetchMock = mockFetch({});
+    setup();
+    fill();
+    fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'ệ'.repeat(25) } });
+    fireEvent.click(screen.getByRole('button', { name: 'Đăng ký' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Mật khẩu tối đa 72 byte (chữ có dấu tính 2–3 byte)');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('mật khẩu đúng 72 byte ASCII vẫn gửi được', async () => {
+    const fetchMock = mockFetch({
+      'POST /api/auth/register': { status: 201, body: { accessToken: 'tok', user: landlord } },
+    });
+    setup();
+    fill();
+    fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: 'a'.repeat(72) } });
+    fireEvent.click(screen.getByRole('button', { name: 'Đăng ký' }));
+    expect(await screen.findByText('Trang chủ')).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it('400 với nhiều lỗi thì nối bằng "; "', async () => {
     mockFetch({
       'POST /api/auth/register': { status: 400, body: { statusCode: 400, message: ['lỗi một', 'lỗi hai'] } },

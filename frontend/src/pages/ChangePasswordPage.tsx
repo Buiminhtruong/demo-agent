@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { api } from '../api/client';
+import { PASSWORD_TOO_LONG, passwordTooLong } from '../auth/password';
 
 export default function ChangePasswordPage() {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -10,8 +11,12 @@ export default function ChangePasswordPage() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    setError('');
     setDone(false);
+    if (passwordTooLong(newPassword)) {
+      setError(PASSWORD_TOO_LONG);
+      return;
+    }
+    setError('');
     setBusy(true);
     try {
       await api<void>('/api/auth/password', {
@@ -48,13 +53,12 @@ export default function ChangePasswordPage() {
             type="password"
             required
             minLength={8}
-            maxLength={72}
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             autoComplete="new-password"
           />
         </label>
-        <p className="note">Mật khẩu mới từ 8 đến 72 ký tự.</p>
+        <p className="note">Mật khẩu mới ít nhất 8 ký tự, tối đa 72 byte (chữ có dấu tính 2–3 byte).</p>
         {error && (
           <div className="error" role="alert">
             {error}

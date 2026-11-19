@@ -77,6 +77,37 @@ describe('Auth (e2e)', () => {
       expect(res.status).toBe(400);
     });
 
+    it('thông báo lỗi kiểm tra dữ liệu bằng tiếng Việt', async () => {
+      const email = await register(tenantBody({ email: 'ten@gmail' }));
+      expect(email.status).toBe(400);
+      expect(email.body.message).toEqual(['Email không hợp lệ']);
+
+      const name = await register(tenantBody({ fullName: '   ' }));
+      expect(name.status).toBe(400);
+      expect(name.body.message).toEqual(['Vui lòng nhập họ tên']);
+
+      // Thiếu hẳn trường: mỗi trường chỉ một thông báo, không lặp.
+      const missing = await register(tenantBody({ fullName: undefined }));
+      expect(missing.status).toBe(400);
+      expect(missing.body.message).toEqual(['Vui lòng nhập họ tên']);
+      const noPw = await register(tenantBody({ password: undefined }));
+      expect(noPw.body.message).toEqual(['Vui lòng nhập mật khẩu']);
+
+      const role = await register(tenantBody({ role: 'admin' }));
+      expect(role.body.message).toEqual(['Vai trò không hợp lệ']);
+
+      const short = await register(tenantBody({ password: '1234567' }));
+      expect(short.body.message).toEqual(['Mật khẩu phải có ít nhất 8 ký tự']);
+    });
+
+    it('mật khẩu 25 ký tự có dấu nhưng quá 72 byte → 400', async () => {
+      const res = await register(tenantBody({ password: 'ệ'.repeat(25) }));
+      expect(res.status).toBe(400);
+      expect(res.body.message).toEqual([
+        'Mật khẩu tối đa 72 byte (chữ có dấu tính 2–3 byte)',
+      ]);
+    });
+
     it('số điện thoại không phải 9–11 chữ số → 400', async () => {
       await register(tenantBody({ phone: '12345678' })).expect(400);
       await register(tenantBody({ phone: '090123456789' })).expect(400);
@@ -95,6 +126,17 @@ describe('Auth (e2e)', () => {
       expect(typeof res.body.accessToken).toBe('string');
       expect(res.body.user.email).toBe('thue@example.com');
       expect(res.body.user.passwordHash).toBeUndefined();
+    });
+
+    it('thiếu email/mật khẩu → 400 tiếng Việt', async () => {
+      const res = await request(http)
+        .post('/api/auth/login')
+        .send({ email: '', password: '' });
+      expect(res.status).toBe(400);
+      expect(res.body.message).toEqual([
+        'Vui lòng nhập email',
+        'Vui lòng nhập mật khẩu',
+      ]);
     });
 
     it('sai mật khẩu → 401', async () => {
@@ -201,6 +243,18 @@ describe('Auth (e2e)', () => {
         .expect(204);
       await login('thue@example.com', 'matkhaumoi1').expect(200);
       await login('thue@example.com', PASSWORD).expect(401);
+    });
+
+    it('thiếu mật khẩu hiện tại / mật khẩu mới quá 72 byte → 400 tiếng Việt', async () => {
+      const res = await request(http)
+        .patch('/api/auth/password')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ currentPassword: '', newPassword: 'ệ'.repeat(25) });
+      expect(res.status).toBe(400);
+      expect(res.body.message).toEqual([
+        'Vui lòng nhập mật khẩu hiện tại',
+        'Mật khẩu tối đa 72 byte (chữ có dấu tính 2–3 byte)',
+      ]);
     });
 
     it('không có token → 401', async () => {

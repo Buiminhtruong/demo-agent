@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { PASSWORD_TOO_LONG, passwordTooLong } from '../auth/password';
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -15,6 +16,10 @@ export default function RegisterPage() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (passwordTooLong(password)) {
+      setError(PASSWORD_TOO_LONG);
+      return;
+    }
     setError('');
     setBusy(true);
     try {
@@ -67,13 +72,12 @@ export default function RegisterPage() {
             type="password"
             required
             minLength={8}
-            maxLength={72}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
           />
         </label>
-        <p className="note">Mật khẩu từ 8 đến 72 ký tự.</p>
+        <p className="note">Mật khẩu ít nhất 8 ký tự, tối đa 72 byte (chữ có dấu tính 2–3 byte).</p>
         {error && (
           <div className="error" role="alert">
             {error}

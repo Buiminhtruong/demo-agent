@@ -26,6 +26,24 @@ export function setToken(token: string | null): void {
   }
 }
 
+export const SESSION_EXPIRED = 'Phiên đăng nhập đã hết, vui lòng đăng nhập lại';
+
+/**
+ * AuthProvider đăng ký để xử lý 401 tập trung.
+ * snapshot(): số phiên lúc gửi request; handle(snap): đăng xuất nếu phiên vẫn là snap
+ * (để phản hồi cũ không đăng xuất một phiên mới hơn).
+ */
+export interface UnauthorizedHandler {
+  snapshot(): number;
+  handle(snapshot: number): void;
+}
+
+let unauthorizedHandler: UnauthorizedHandler | null = null;
+
+export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): void {
+  unauthorizedHandler = handler;
+}
+
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   if (init.body !== undefined && !headers.has('Content-Type')) {
@@ -34,7 +52,17 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = getToken();
   if (token) headers.set('Authorization', `Bearer ${token}`);
 
+  const method = (init.method ?? 'GET').toUpperCase();
+  // 401 của đăng nhập nghĩa là sai email/mật khẩu, không phải hết phiên.
+  const isLogin = method === 'POST' && path === '/api/auth/login';
+  const handler = isLogin ? null : unauthorizedHandler;
+  const snap = handler?.snapshot();
+
   const res = await fetch(path, { ...init, headers });
+  if (res.status === 401 && !isLogin) {
+    if (handler && snap !== undefined) handler.handle(snap);
+    throw new ApiError(401, SESSION_EXPIRED);
+  }
   if (res.status === 204) return undefined as T;
 
   let data: unknown = null;

@@ -18,7 +18,7 @@ export function safeNext(next: string | null): string {
 }
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, notice } = useAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [email, setEmail] = useState('');
@@ -57,9 +57,9 @@ export default function LoginPage() {
             autoComplete="current-password"
           />
         </label>
-        {error && (
+        {(error || notice) && (
           <div className="error" role="alert">
-            {error}
+            {error || notice}
           </div>
         )}
         <button className="btn" type="submit" disabled={busy}>
