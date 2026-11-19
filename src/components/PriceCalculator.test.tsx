@@ -120,6 +120,14 @@ describe('PriceCalculator', () => {
       vi.setSystemTime(new Date('2026-11-27T00:00:00+07:00'))
       expect(await copied(promo)).toBe(base)
     })
+    it('mở trang khi còn hạn, bấm chép sau khi hết hạn thì không kèm mã', async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+      const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
+      render(<PriceCalculator types={proxyTypes} selectedId="ipv4" onSelect={() => {}} links={links} promo={promo} />)
+      vi.setSystemTime(new Date('2026-11-27T00:00:00+07:00'))
+      await user.click(screen.getByRole('button', { name: /Copy tin nhắn/ }))
+      expect(writeText).toHaveBeenCalledWith(base)
+    })
   })
 
   it('đã chép rồi đổi số lượng thì nút quay về "Copy tin nhắn" (tránh dán nhầm tổng cũ)', async () => {

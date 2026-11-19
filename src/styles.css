@@ -172,7 +172,7 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
   .header-zalo { display: none; }
   .promo { font-size: 14px; }
   .promo-bar { gap: 8px; justify-content: flex-start; padding-right: 52px; }
-  .promo-close { right: 8px; top: 6px; }
+  .promo-close { right: 4px; top: 2px; min-width: 44px; min-height: 44px; }
   .hero { padding: 40px 0; }
   .hero h1 { font-size: 28px; }
   .hero .actions .btn { display: block; margin: 0 0 10px; text-align: center; }

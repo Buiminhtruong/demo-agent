@@ -84,7 +84,8 @@ export default function PriceCalculator({ types, selectedId, onSelect, links, pr
         <a className="btn btn-zalo" href={links.zalo} target="_blank" rel="noopener noreferrer">Mua qua Zalo</a>
         <CopyMessageButton
           key={`${plan.code}-${qtyText}`} // gói/số lượng đổi thì nút về trạng thái ban đầu, không báo "Đã chép" câu cũ
-          message={qty === null ? '' : withPromoCode(quoteMessage(calcMessageTemplate, type, plan, qty), promo, new Date())}
+          // tạo tin lúc bấm để mã khuyến mãi theo giờ hiện tại (hết hạn giữa chừng thì không kèm mã)
+          message={() => (qty === null ? '' : withPromoCode(quoteMessage(calcMessageTemplate, type, plan, qty), promo, new Date()))}
           code={plan.code}
           label="📋 Copy tin nhắn"
           disabled={qty === null}
