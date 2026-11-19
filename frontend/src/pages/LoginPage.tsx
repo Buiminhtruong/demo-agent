@@ -8,7 +8,10 @@ export function safeNext(next: string | null): string {
   try {
     const url = new URL(next, window.location.origin);
     if (url.origin !== window.location.origin) return '/';
-    return url.pathname + url.search + url.hash;
+    const path = url.pathname + url.search + url.hash;
+    // Sau chuẩn hoá, "/.//evil.com" thành "//evil.com": vẫn bị coi là URL ngoài site khi điều hướng.
+    if (path.startsWith('//') || path.startsWith('/\\')) return '/';
+    return path;
   } catch {
     return '/';
   }

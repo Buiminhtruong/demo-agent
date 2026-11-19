@@ -104,6 +104,8 @@ describe('LoginPage', () => {
     expect(safeNext('/\\evil.com')).toBe('/');
     expect(safeNext('https://evil.com')).toBe('/');
     expect(safeNext('//evil.com')).toBe('/');
+    expect(safeNext('/.//evil.com')).toBe('/');
+    expect(safeNext('/..//evil.com')).toBe('/');
     expect(safeNext('/phong/5?x=1')).toBe('/phong/5?x=1');
     expect(safeNext(null)).toBe('/');
   });

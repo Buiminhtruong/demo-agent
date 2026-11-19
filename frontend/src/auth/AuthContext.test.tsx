@@ -58,7 +58,8 @@ describe('AuthProvider: /me trả về muộn', () => {
     await act(async () => {
       resolveMe({ status: 200, body: tenant });
     });
-    expect(screen.getByText('user:Trần Bình')).toBeInTheDocument();
+    expect(await screen.findByText('user:Trần Bình')).toBeInTheDocument();
+    expect(localStorage.getItem('token')).toBe('fresh');
   });
 
   it('C: đăng xuất khi /me đang chờ thì /me không làm user sống lại', async () => {
