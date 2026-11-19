@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { copyText } from '../lib/copy-text'
 
-type Props = { message: string; code: string }
+type Props = { message: string; code: string; label?: string; disabled?: boolean }
 
-export default function CopyMessageButton({ message, code }: Props) {
+export default function CopyMessageButton({ message, code, label: idleLabel = '📋 Copy tin nhắn mẫu', disabled }: Props) {
   const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle')
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
@@ -21,10 +21,10 @@ export default function CopyMessageButton({ message, code }: Props) {
       ? '✅ Đã chép — dán vào Zalo/Telegram'
       : state === 'failed'
         ? `⚠️ Không chép được — hãy nhắn mã ${code}`
-        : '📋 Copy tin nhắn mẫu'
+        : idleLabel
 
   return (
-    <button type="button" className={`copy-msg ${state}`} onClick={handleClick} aria-live="polite">
+    <button type="button" className={`copy-msg ${state}`} onClick={handleClick} aria-live="polite" disabled={disabled}>
       {label}
     </button>
   )
