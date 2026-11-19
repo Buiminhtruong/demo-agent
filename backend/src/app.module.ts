@@ -1,20 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { shouldSynchronize } from './database.config';
+import { AuthModule } from './auth/auth.module';
+import { typeOrmOptions } from './database.config';
 import { HealthController } from './health.controller';
-
-const DEFAULT_DATABASE_URL = 'postgres://app:app@localhost:5432/app';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
-      useFactory: () => ({
-        type: 'postgres' as const,
-        url: process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL,
-        autoLoadEntities: true,
-        synchronize: shouldSynchronize(process.env.NODE_ENV),
-      }),
-    }),
+    TypeOrmModule.forRootAsync({ useFactory: typeOrmOptions }),
+    UsersModule,
+    AuthModule,
   ],
   controllers: [HealthController],
 })
