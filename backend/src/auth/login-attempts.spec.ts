@@ -11,8 +11,9 @@ describe('LoginAttempts', () => {
     attempts = new LoginAttempts(() => now);
   });
 
+  // Giữ chỗ n lần thử mà không trả lại = n lần sai.
   function failTimes(email: string, n: number) {
-    for (let i = 0; i < n; i++) attempts.recordFailure(email);
+    for (let i = 0; i < n; i++) attempts.reserve(email);
   }
 
   it('chưa sai lần nào thì không bị chặn', () => {
@@ -27,6 +28,7 @@ describe('LoginAttempts', () => {
   it('sai 5 lần thì lần kế bị chặn', () => {
     failTimes('a@x.com', 5);
     expect(attempts.isBlocked('a@x.com')).toBe(true);
+    expect(attempts.reserve('a@x.com')).toBeNull();
   });
 
   it('không phân biệt hoa thường và khoảng trắng của email', () => {
@@ -61,5 +63,40 @@ describe('LoginAttempts', () => {
     attempts.reset('A@x.com');
     failTimes('a@x.com', 4);
     expect(attempts.isBlocked('a@x.com')).toBe(false);
+  });
+
+  describe('giữ chỗ (chống gửi đồng thời)', () => {
+    it('các lần thử đang chạy cũng được tính: chỉ 5 lần đầu giữ được chỗ', () => {
+      const results = Array.from({ length: 10 }, () =>
+        attempts.reserve('a@x.com'),
+      );
+      expect(results.filter((r) => r !== null)).toHaveLength(5);
+      expect(results.slice(5)).toEqual([null, null, null, null, null]);
+    });
+
+    it('lần bị chặn không kéo dài cửa sổ 15 phút', () => {
+      failTimes('a@x.com', 5);
+      now += 10 * MINUTE;
+      expect(attempts.reserve('a@x.com')).toBeNull();
+      now += 5 * MINUTE;
+      expect(attempts.isBlocked('a@x.com')).toBe(false);
+    });
+
+    it('trả lại chỗ (không phải lần sai) thì không bị tính', () => {
+      failTimes('a@x.com', 4);
+      const ticket = attempts.reserve('a@x.com');
+      expect(ticket).not.toBeNull();
+      attempts.release('A@x.com', ticket as number);
+      expect(attempts.isBlocked('a@x.com')).toBe(false);
+    });
+
+    it('trả lại chỉ bỏ đúng một chỗ', () => {
+      failTimes('a@x.com', 4);
+      const ticket = attempts.reserve('a@x.com') as number;
+      attempts.release('a@x.com', ticket);
+      attempts.release('a@x.com', ticket);
+      failTimes('a@x.com', 1);
+      expect(attempts.isBlocked('a@x.com')).toBe(true);
+    });
   });
 });

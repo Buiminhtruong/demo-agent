@@ -62,22 +62,31 @@ export class AuthService {
   }
 
   async login(dto: LoginDto): Promise<AuthResult> {
-    if (this.loginAttempts.isBlocked(dto.email)) {
+    // Giữ chỗ trước mọi await để các yêu cầu đồng thời không cùng lọt qua giới hạn.
+    const ticket = this.loginAttempts.reserve(dto.email);
+    if (ticket === null) {
       throw new HttpException(
         'Bạn nhập sai quá nhiều lần, thử lại sau 15 phút',
         HttpStatus.TOO_MANY_REQUESTS,
       );
     }
-    const user = await this.usersService.findByEmail(dto.email);
-    if (!user || !(await verifyPassword(dto.password, user.passwordHash))) {
-      this.loginAttempts.recordFailure(dto.email);
-      throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
+    // Sai → giữ nguyên chỗ (một lần sai). Đúng → reset. Còn lại (bị khoá, lỗi hệ thống) → trả chỗ.
+    let settled = false;
+    try {
+      const user = await this.usersService.findByEmail(dto.email);
+      if (!user || !(await verifyPassword(dto.password, user.passwordHash))) {
+        settled = true;
+        throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
+      }
+      if (user.isLocked) {
+        throw new ForbiddenException('Tài khoản đã bị khoá');
+      }
+      this.loginAttempts.reset(dto.email);
+      settled = true;
+      return await this.authResult(user);
+    } finally {
+      if (!settled) this.loginAttempts.release(dto.email, ticket);
     }
-    if (user.isLocked) {
-      throw new ForbiddenException('Tài khoản đã bị khoá');
-    }
-    this.loginAttempts.reset(dto.email);
-    return this.authResult(user);
   }
 
   async changePassword(user: User, dto: ChangePasswordDto): Promise<void> {

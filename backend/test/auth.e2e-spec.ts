@@ -132,6 +132,20 @@ describe('Auth (e2e)', () => {
         'Bạn nhập sai quá nhiều lần, thử lại sau 15 phút',
       );
     });
+
+    it('10 lần sai gửi đồng thời → tối đa 5 lần được thử (401), còn lại 429', async () => {
+      const email = 'dongthoi@example.com';
+      await register(tenantBody({ email })).expect(201);
+      const responses = await Promise.all(
+        Array.from({ length: 10 }, () => login(email, 'saimatkhau')),
+      );
+      const statuses = responses.map((r) => r.status);
+      expect(statuses.filter((s) => s === 401).length).toBeLessThanOrEqual(5);
+      expect(statuses.filter((s) => s !== 401).every((s) => s === 429)).toBe(
+        true,
+      );
+      await login(email, PASSWORD).expect(429);
+    });
   });
 
   describe('GET /api/auth/me', () => {
