@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { PlanAdvisorConfig, ProxyType } from '../data/site-data'
 import { formatPrice } from '../lib/format-price'
 import { recommendPlan } from '../lib/plan-advisor'
@@ -12,6 +12,8 @@ type Props = {
 export default function PlanAdvisor({ types, config, onApply }: Props) {
   const [purposeId, setPurposeId] = useState<string | null>(null)
   const [durationId, setDurationId] = useState<string | null>(null)
+  // "Chọn lại" làm ô gợi ý (và chính nút đó) biến mất → đưa focus về lựa chọn đầu của câu 1
+  const firstOptionRef = useRef<HTMLButtonElement>(null)
 
   const purpose = config.purposes.find((p) => p.id === purposeId)
   const duration = config.durations.find((d) => d.id === durationId)
@@ -26,9 +28,10 @@ export default function PlanAdvisor({ types, config, onApply }: Props) {
           <div className="q" role="group" aria-labelledby="advisor-q1">
             <p className="q-title" id="advisor-q1"><span className="num" aria-hidden="true">1</span>{config.purposeQuestion}</p>
             <div className="opts">
-              {config.purposes.map((o) => (
+              {config.purposes.map((o, i) => (
                 <button
                   key={o.id}
+                  ref={i === 0 ? firstOptionRef : undefined}
                   type="button"
                   className={`opt${o.id === purposeId ? ' on' : ''}`}
                   aria-pressed={o.id === purposeId}
@@ -77,6 +80,7 @@ export default function PlanAdvisor({ types, config, onApply }: Props) {
                     onClick={() => {
                       setPurposeId(null)
                       setDurationId(null)
+                      firstOptionRef.current?.focus()
                     }}
                   >
                     ↺ Chọn lại

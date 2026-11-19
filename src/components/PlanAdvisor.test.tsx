@@ -70,6 +70,15 @@ describe('PlanAdvisor', () => {
     expect(pick(/Khoảng 1 tuần/)).toHaveAttribute('aria-pressed', 'false')
   })
 
+  it('"Chọn lại" đưa focus về lựa chọn đầu tiên của câu 1', async () => {
+    const user = userEvent.setup()
+    setup()
+    await user.click(pick(/Thu thập dữ liệu/))
+    await user.click(pick(/Khoảng 1 tuần/))
+    await user.click(pick(/Chọn lại/))
+    expect(pick(/Nuôi tài khoản, chạy quảng cáo/)).toHaveFocus()
+  })
+
   it('vùng gợi ý có aria-live="polite"', async () => {
     const user = userEvent.setup()
     setup()
