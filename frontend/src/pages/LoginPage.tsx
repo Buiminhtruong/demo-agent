@@ -2,9 +2,16 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 
-/** Chỉ cho phép đường dẫn nội bộ (bắt đầu bằng một dấu "/"), tránh chuyển hướng ra ngoài site. */
+/** Chỉ cho phép đích cùng origin (giải mã như trình duyệt, kể cả ký tự điều khiển), tránh chuyển hướng ra ngoài site. */
 export function safeNext(next: string | null): string {
-  return next && next.startsWith('/') && !next.startsWith('//') && !next.startsWith('/\\') ? next : '/';
+  if (!next) return '/';
+  try {
+    const url = new URL(next, window.location.origin);
+    if (url.origin !== window.location.origin) return '/';
+    return url.pathname + url.search + url.hash;
+  } catch {
+    return '/';
+  }
 }
 
 export default function LoginPage() {

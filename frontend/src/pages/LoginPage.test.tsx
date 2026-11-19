@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import LoginPage from './LoginPage';
+import LoginPage, { safeNext } from './LoginPage';
 import { Providers, mockFetch, tenant } from '../test-utils';
 
 function setup(entry: string) {
@@ -79,10 +79,32 @@ describe('LoginPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Tài khoản đã bị khoá');
   });
 
-  it('không chuyển hướng ra ngoài khi next là URL ngoài site', async () => {
+  it.each(['//evil.com', '/%09/evil.com', '/\\evil.com', 'https://evil.com', '/%0A/evil.com'])(
+    'không chuyển hướng ra ngoài khi next=%s',
+    async (next) => {
+      mockFetch({ 'POST /api/auth/login': { status: 200, body: { accessToken: 'tok', user: tenant } } });
+      const assign = vi.fn();
+      vi.stubGlobal('location', { ...window.location, assign, origin: window.location.origin });
+      setup(`/dang-nhap?next=${next.replace('\\', '%5C')}`);
+      submit();
+      expect(await screen.findByText('Trang chủ')).toBeInTheDocument();
+      expect(assign).not.toHaveBeenCalled();
+    },
+  );
+
+  it('giữ nguyên next hợp lệ có query', async () => {
     mockFetch({ 'POST /api/auth/login': { status: 200, body: { accessToken: 'tok', user: tenant } } });
-    setup('/dang-nhap?next=//evil.com');
+    setup('/dang-nhap?next=%2Fphong%2F5%3Fx%3D1');
     submit();
-    expect(await screen.findByText('Trang chủ')).toBeInTheDocument();
+    expect(await screen.findByText('Trang phòng 5')).toBeInTheDocument();
+  });
+
+  it('safeNext xử lý các dạng đầu vào', () => {
+    expect(safeNext('/\t/evil.com')).toBe('/');
+    expect(safeNext('/\\evil.com')).toBe('/');
+    expect(safeNext('https://evil.com')).toBe('/');
+    expect(safeNext('//evil.com')).toBe('/');
+    expect(safeNext('/phong/5?x=1')).toBe('/phong/5?x=1');
+    expect(safeNext(null)).toBe('/');
   });
 });

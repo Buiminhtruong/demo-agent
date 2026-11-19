@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { api, ApiError, getToken, setToken } from '../api/client';
 import type { AuthResponse, PublicUser, RegisterInput } from '../api/types';
 
@@ -16,15 +16,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<PublicUser | null>(null);
   const [loading, setLoading] = useState<boolean>(() => getToken() !== null);
 
+  // Tăng mỗi khi đăng nhập/đăng ký/đăng xuất: kết quả /me cũ không được ghi đè phiên mới.
+  const session = useRef(0);
+
   useEffect(() => {
     if (!getToken()) return;
+    const mine = session.current;
     let cancelled = false;
+    const current = () => !cancelled && session.current === mine;
     api<PublicUser>('/api/auth/me')
       .then((u) => {
-        if (!cancelled) setUser(u);
+        if (current()) setUser(u);
       })
       .catch((e) => {
-        if (e instanceof ApiError && e.status === 401) setToken(null);
+        if (current() && e instanceof ApiError && e.status === 401) setToken(null);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -39,6 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
+    session.current += 1;
     setToken(res.accessToken);
     setUser(res.user);
   }, []);
@@ -48,11 +54,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: 'POST',
       body: JSON.stringify(input),
     });
+    session.current += 1;
     setToken(res.accessToken);
     setUser(res.user);
   }, []);
 
   const logout = useCallback(() => {
+    session.current += 1;
     setToken(null);
     setUser(null);
   }, []);
