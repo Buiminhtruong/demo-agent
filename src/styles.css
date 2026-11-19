@@ -81,6 +81,23 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 .copy-msg.failed { border-style: solid; border-color: #d97706; color: #b45309; background: #fffbeb; }
 .note { text-align: center; color: var(--muted); margin-top: 20px; font-size: 14px; }
 
+/* Ô "Tính tiền nhanh" dưới bảng giá */
+.calc { max-width: 760px; margin: 32px auto 0; border: 2px solid var(--primary); background: #f8fbff; scroll-margin-top: 80px; }
+.calc h3 { margin: 0 0 4px; font-size: 20px; }
+.calc .hint { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
+.calc-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.calc label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.calc select, .calc input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; font-size: 16px; background: #fff; color: var(--text); }
+.calc input[aria-invalid="true"] { border-color: #d97706; }
+.calc-error { color: #b45309; font-size: 14px; margin: 10px 0 0; }
+.calc-total { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-top: 1px dashed var(--line); margin-top: 18px; padding-top: 16px; }
+.calc-total .formula { color: var(--muted); font-size: 15px; }
+.calc-total .sum { font-size: 30px; font-weight: 800; color: var(--primary-dark); }
+.calc-actions { display: flex; align-items: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.calc-actions .copy-msg { margin-top: 0; padding: 10px 16px; font-weight: 600; }
+.calc-actions .copy-msg.idle { border: 1px solid var(--primary); color: var(--primary); }
+.copy-msg:disabled { opacity: .5; cursor: not-allowed; }
+
 .btn-outline { background: #fff; color: var(--primary); border-color: var(--primary); padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
 .btn-outline:hover { background: #eff6ff; }
 .compare { width: 100%; border-collapse: separate; border-spacing: 0; background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
@@ -138,7 +155,9 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 }
 
 @media (max-width: 767px) {
-  .grid3, .steps, .site-footer .cols { grid-template-columns: 1fr; }
+  .grid3, .steps, .site-footer .cols, .calc-row { grid-template-columns: 1fr; }
+  .calc-actions > * { flex: 1; text-align: center; }
+  .calc-total .sum { font-size: 26px; }
   .header-zalo { display: none; }
   .hero { padding: 40px 0; }
   .hero h1 { font-size: 28px; }

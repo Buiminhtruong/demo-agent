@@ -3,6 +3,7 @@ import Header from './components/Header'
 import Hero from './components/Hero'
 import ProxyTypes from './components/ProxyTypes'
 import Pricing from './components/Pricing'
+import PriceCalculator from './components/PriceCalculator'
 import Compare from './components/Compare'
 import Reviews from './components/Reviews'
 import HowToBuy from './components/HowToBuy'
@@ -28,7 +29,9 @@ export default function App() {
         <Hero shop={shop} links={links} />
         <ProxyTypes types={proxyTypes} onSelect={pickType} />
         <Compare types={proxyTypes} onSelect={pickType} />
-        <Pricing types={proxyTypes} selectedId={selectedTypeId} onSelect={setSelectedTypeId} links={links} />
+        <Pricing types={proxyTypes} selectedId={selectedTypeId} onSelect={setSelectedTypeId} links={links}>
+          <PriceCalculator types={proxyTypes} selectedId={selectedTypeId} onSelect={setSelectedTypeId} links={links} />
+        </Pricing>
         <Reviews items={reviews} types={proxyTypes} sample={reviewsAreSample} />
         <HowToBuy />
         <Faq items={faqs} />

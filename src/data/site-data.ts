@@ -65,6 +65,9 @@ export const contact: Contact = {
 // {code} = mã gói, {type} = loại proxy, {plan} = tên gói, {price} = giá
 export const orderMessageTemplate = 'Chào shop, mình muốn mua gói {code} ({type} – {plan}, {price}/IP). Số lượng: ... IP'
 
+// Câu khách chép ở ô "Tính tiền nhanh". Ngoài các chỗ trên: {qty} = số lượng IP, {total} = tổng tiền
+export const calcMessageTemplate = 'Chào shop, mình muốn mua gói {code} ({type} – {plan}), số lượng: {qty} IP, tổng {total}.'
+
 const base = ['HTTP & SOCKS5', 'Băng thông không giới hạn']
 
 export const proxyTypes: ProxyType[] = [

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { orderMessageTemplate, type ProxyType } from '../data/site-data'
 import type { contactLinks } from '../lib/contact-links'
 import { formatPrice } from '../lib/format-price'
@@ -9,9 +10,10 @@ type Props = {
   selectedId: string
   onSelect: (id: string) => void
   links: ReturnType<typeof contactLinks>
+  children?: ReactNode // hiện cuối phần Bảng giá (ô tính giá)
 }
 
-export default function Pricing({ types, selectedId, onSelect, links }: Props) {
+export default function Pricing({ types, selectedId, onSelect, links, children }: Props) {
   const selected = types.find((t) => t.id === selectedId) ?? types[0]
   return (
     <section id="bang-gia" className="alt-bg">
@@ -56,6 +58,7 @@ export default function Pricing({ types, selectedId, onSelect, links }: Props) {
           ))}
         </div>
         <p className="note">Khi nhắn, gửi kèm <b>mã gói</b> để được xử lý nhanh.</p>
+        {children}
       </div>
     </section>
   )

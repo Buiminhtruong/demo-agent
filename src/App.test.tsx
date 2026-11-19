@@ -41,6 +41,19 @@ describe('App', () => {
     expect(target.id).toBe('bang-gia')
   })
 
+  it('ô tính giá nằm trong Bảng giá, sau các gói, và đi theo tab đang chọn', async () => {
+    const user = userEvent.setup()
+    const { container } = render(<App />)
+    const section = container.querySelector('#bang-gia') as HTMLElement
+    const calc = section.querySelector('#tinh-gia') as HTMLElement
+    expect(calc).not.toBeNull()
+    expect(section.querySelector('#plan-panel')!.compareDocumentPosition(calc) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    await user.click(screen.getByRole('tab', { name: 'IPv6' }))
+    expect(within(calc).getByLabelText('Loại proxy')).toHaveValue('ipv6')
+    await user.selectOptions(within(calc).getByLabelText('Loại proxy'), 'residential')
+    expect(screen.getByRole('tab', { name: 'Proxy dân cư xoay' })).toHaveAttribute('aria-selected', 'true')
+  })
+
   it('các phần mới nằm đúng thứ tự trên trang', () => {
     const { container } = render(<App />)
     const ids = Array.from(container.querySelectorAll('main > section')).map((s) => s.id)
