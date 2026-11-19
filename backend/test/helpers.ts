@@ -16,6 +16,14 @@ export async function createTestApp(): Promise<INestApplication> {
 
 export async function resetDb(app: INestApplication): Promise<void> {
   const dataSource = app.get(DataSource);
+  const [{ db: dbName }] = await dataSource.query(
+    'SELECT current_database() AS db',
+  );
+  if (!dbName.endsWith('_test')) {
+    throw new Error(
+      `resetDb từ chối chạy: database "${dbName}" không phải DB test (tên phải kết thúc bằng _test)`,
+    );
+  }
   const tables = dataSource.entityMetadatas
     .map((meta) => `"${meta.tableName}"`)
     .join(', ');
