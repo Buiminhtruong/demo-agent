@@ -68,6 +68,18 @@ export const orderMessageTemplate = 'Chào shop, mình muốn mua gói {code} ({
 // Câu khách chép ở ô "Tính tiền nhanh". Ngoài các chỗ trên: {qty} = số lượng IP, {total} = tổng tiền
 export const calcMessageTemplate = 'Chào shop, mình muốn mua gói {code} ({type} – {plan}), số lượng: {qty} IP, tổng {total}.'
 
+// Banner khuyến mãi trên đầu trang. endsAt = giờ hết hạn (ISO 8601, có múi giờ).
+// Hết hạn thì banner tự ẩn và tin nhắn mẫu không kèm mã nữa.
+export type Promo = { message: string; code: string; endsAt: string }
+
+// DỮ LIỆU MẪU: nội dung, mã và hạn là giả — shop thay bằng khuyến mãi thật; đặt null để ẩn banner.
+// Banner chỉ hiện mã, tổng tiền trên web vẫn là giá gốc (shop tự trừ khi nhận mã).
+export const promo: Promo | null = {
+  message: '🔥 Giảm 10% mọi gói 30 ngày',
+  code: 'PROXY10',
+  endsAt: '2026-11-26T23:59:59+07:00',
+}
+
 const base = ['HTTP & SOCKS5', 'Băng thông không giới hạn']
 
 export const proxyTypes: ProxyType[] = [

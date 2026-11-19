@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import PriceCalculator from './PriceCalculator'
@@ -90,6 +90,44 @@ describe('PriceCalculator', () => {
       'Chào shop, mình muốn mua gói V4-30D (IPv4 riêng – Gói 30 ngày), số lượng: 10 IP, tổng 1.200.000đ.',
     )
     expect(await screen.findByRole('button', { name: /Đã chép/ })).toBeInTheDocument()
+  })
+
+  describe('mã khuyến mãi trong tin nhắn chép', () => {
+    const promo = { message: 'Giảm 10%', code: 'PROXY10', endsAt: '2026-11-26T23:59:59+07:00' }
+    const base = 'Chào shop, mình muốn mua gói V4-30D (IPv4 riêng – Gói 30 ngày), số lượng: 1 IP, tổng 120.000đ.'
+
+    async function copied(p: typeof promo | null) {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+      const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
+      render(<PriceCalculator types={proxyTypes} selectedId="ipv4" onSelect={() => {}} links={links} promo={p} />)
+      await user.click(screen.getByRole('button', { name: /Copy tin nhắn/ }))
+      return writeText.mock.calls[0][0]
+    }
+
+    beforeEach(() => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      vi.setSystemTime(new Date('2026-11-20T00:00:00+07:00'))
+    })
+    afterEach(() => vi.useRealTimers())
+
+    it('còn khuyến mãi thì cuối câu có " Mã: PROXY10", tổng vẫn giá gốc', async () => {
+      expect(await copied(promo)).toBe(`${base} Mã: PROXY10`)
+    })
+    it('không có khuyến mãi thì không kèm mã', async () => {
+      expect(await copied(null)).toBe(base)
+    })
+    it('khuyến mãi hết hạn thì không kèm mã', async () => {
+      vi.setSystemTime(new Date('2026-11-27T00:00:00+07:00'))
+      expect(await copied(promo)).toBe(base)
+    })
+    it('mở trang khi còn hạn, bấm chép sau khi hết hạn thì không kèm mã', async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+      const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
+      render(<PriceCalculator types={proxyTypes} selectedId="ipv4" onSelect={() => {}} links={links} promo={promo} />)
+      vi.setSystemTime(new Date('2026-11-27T00:00:00+07:00'))
+      await user.click(screen.getByRole('button', { name: /Copy tin nhắn/ }))
+      expect(writeText).toHaveBeenCalledWith(base)
+    })
   })
 
   it('đã chép rồi đổi số lượng thì nút quay về "Copy tin nhắn" (tránh dán nhầm tổng cũ)', async () => {

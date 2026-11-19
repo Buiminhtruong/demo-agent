@@ -10,6 +10,21 @@ describe('App', () => {
     Element.prototype.scrollIntoView = scrollIntoView
   })
 
+  it('banner khuyến mãi nằm trên Header khi mã mẫu còn hạn (giờ được cố định)', () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    vi.setSystemTime(new Date('2026-11-20T00:00:00+07:00'))
+    try {
+      localStorage.clear()
+      const { container } = render(<App />)
+      const banner = screen.getByRole('region', { name: 'Khuyến mãi' })
+      const header = container.querySelector('header') as HTMLElement
+      expect(banner).toHaveTextContent('PROXY10')
+      expect(banner.compareDocumentPosition(header) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('mặc định hiện gói của loại đầu tiên', () => {
     render(<App />)
     expect(screen.getByText('V4-30D')).toBeInTheDocument()
