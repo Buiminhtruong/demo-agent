@@ -109,6 +109,28 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 .calc-actions .copy-msg.idle { border: 1px solid var(--primary); color: var(--primary); }
 .copy-msg:disabled { opacity: .5; cursor: not-allowed; }
 
+/* "Chưa biết chọn gói nào?" */
+.btn-primary { background: var(--primary); color: #fff; cursor: pointer; font: inherit; font-weight: 600; }
+.btn-ghost { background: #fff; color: var(--muted); border-color: var(--line); cursor: pointer; font: inherit; font-weight: 600; }
+.wizard { max-width: 760px; margin: 0 auto; }
+.q { margin: 0 0 18px; }
+.q-title { font-weight: 700; margin: 0 0 10px; }
+.q-title .num { display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; text-align: center; font-size: 14px; line-height: 24px; margin-right: 6px; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.opts.three { grid-template-columns: repeat(3, 1fr); }
+.opt { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: #fff; font: inherit; font-size: 15px; color: var(--text); text-align: left; cursor: pointer; }
+.opt:hover { border-color: var(--primary); }
+.opt small { display: block; color: var(--muted); font-size: 13px; }
+.opt.on { border: 2px solid var(--primary); padding: 9px 11px; background: #eff6ff; font-weight: 600; }
+.result { border: 2px solid var(--primary); background: #f8fbff; border-radius: 12px; padding: 18px; margin-top: 6px; }
+.result .label { color: var(--muted); font-size: 14px; margin: 0; }
+.result h3 { margin: 2px 0 6px; font-size: 22px; }
+.result .code { background: #dbeafe; vertical-align: middle; }
+.advisor-price { font-size: 24px; font-weight: 800; color: var(--primary-dark); }
+.advisor-price small { font-size: 14px; color: var(--muted); font-weight: 400; }
+.why { margin: 8px 0 14px; font-size: 15px; }
+.advisor-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
 .btn-outline { background: #fff; color: var(--primary); border-color: var(--primary); padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
 .btn-outline:hover { background: #eff6ff; }
 .compare { width: 100%; border-collapse: separate; border-spacing: 0; background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
@@ -168,6 +190,8 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 @media (max-width: 767px) {
   .grid3, .steps, .site-footer .cols, .calc-row { grid-template-columns: 1fr; }
   .calc-actions > * { flex: 1; text-align: center; }
+  .opts, .opts.three { grid-template-columns: 1fr; }
+  .advisor-actions .btn { flex: 1; text-align: center; }
   .calc-total .sum { font-size: 26px; }
   .header-zalo { display: none; }
   .promo { font-size: 14px; }

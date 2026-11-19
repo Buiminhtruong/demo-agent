@@ -133,6 +133,57 @@ export const proxyTypes: ProxyType[] = [
   },
 ]
 
+// "Chưa biết chọn gói nào?" — shop sửa câu hỏi/lựa chọn ở đây.
+// typeId = id trong proxyTypes; duration = tên thời hạn của gói (vd '7 ngày'); reason = câu giải thích gói gợi ý.
+export type AdvisorPurposeOption = { id: string; title: string; hint: string; typeId: string; reason: string }
+export type AdvisorDurationOption = { id: string; title: string; duration: string }
+export type PlanAdvisorConfig = {
+  purposeQuestion: string
+  purposes: AdvisorPurposeOption[]
+  durationQuestion: string
+  durations: AdvisorDurationOption[]
+}
+
+export const planAdvisor: PlanAdvisorConfig = {
+  purposeQuestion: 'Bạn dùng proxy để làm gì?',
+  purposes: [
+    {
+      id: 'ads',
+      title: 'Nuôi tài khoản, chạy quảng cáo',
+      hint: 'Facebook, TikTok, Google Ads…',
+      typeId: 'ipv4',
+      reason: 'IP tĩnh riêng một mình bạn, ổn định lâu dài — hợp nuôi tài khoản và chạy quảng cáo.',
+    },
+    {
+      id: 'tool',
+      title: 'Chạy tool số lượng lớn',
+      hint: 'Trang có hỗ trợ IPv6',
+      typeId: 'ipv6',
+      reason: 'Giá rẻ, mua được số lượng lớn — hợp chạy tool trên trang hỗ trợ IPv6.',
+    },
+    {
+      id: 'data',
+      title: 'Thu thập dữ liệu',
+      hint: 'Cần IP tự đổi, ít bị chặn',
+      typeId: 'residential',
+      reason: 'IP nhà mạng thật, tự đổi theo thời gian — ít bị chặn khi thu thập dữ liệu.',
+    },
+    {
+      id: 'unsure',
+      title: 'Chưa rõ / việc khác',
+      hint: 'Chọn loại dùng được hầu hết trang',
+      typeId: 'ipv4',
+      reason: 'Dùng được trên hầu hết mọi trang, ổn định — lựa chọn an toàn khi chưa rõ nhu cầu.',
+    },
+  ],
+  durationQuestion: 'Bạn cần dùng trong bao lâu?',
+  durations: [
+    { id: 'd1', title: 'Dùng thử 1 ngày', duration: '1 ngày' },
+    { id: 'd7', title: 'Khoảng 1 tuần', duration: '7 ngày' },
+    { id: 'd30', title: '1 tháng trở lên', duration: '30 ngày' },
+  ],
+}
+
 // DỮ LIỆU MẪU: đánh giá bịa để dựng giao diện — thay bằng đánh giá thật của khách.
 // Khi đã thay hết bằng đánh giá thật, đổi reviewsAreSample thành false để ẩn dòng "dữ liệu mẫu".
 export const reviewsAreSample = true

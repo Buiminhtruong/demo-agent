@@ -12,17 +12,23 @@ type Props = {
   onSelect: (id: string) => void
   links: ReturnType<typeof contactLinks>
   promo?: Promo | null
+  // Tuỳ chọn: truyền cả hai để cha điều khiển thời hạn (vd trợ lý chọn gói); không truyền thì tự giữ state
+  duration?: string
+  onDurationChange?: (duration: string) => void
 }
 
 function popularPlan(type: ProxyType | undefined): Plan | undefined {
   return type?.plans.find((p) => p.popular) ?? type?.plans[0]
 }
 
-export default function PriceCalculator({ types, selectedId, onSelect, links, promo = null }: Props) {
+export default function PriceCalculator({ types, selectedId, onSelect, links, promo = null, duration: durationProp, onDurationChange }: Props) {
   const type = types.find((t) => t.id === selectedId) ?? types[0]
   // Nhớ thời hạn theo tên (vd "7 ngày") để đổi loại proxy vẫn giữ cùng thời hạn;
   // loại mới không có thời hạn đó thì dùng gói phổ biến của loại đó
-  const [duration, setDuration] = useState(() => popularPlan(type)?.duration ?? '')
+  const [ownDuration, setOwnDuration] = useState(() => popularPlan(type)?.duration ?? '')
+  const controlled = durationProp !== undefined && onDurationChange !== undefined
+  const duration = controlled ? durationProp : ownDuration
+  const setDuration = controlled ? onDurationChange : setOwnDuration
   const [qtyText, setQtyText] = useState('1')
 
   const plan = type?.plans.find((p) => p.duration === duration) ?? popularPlan(type)
