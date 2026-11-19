@@ -91,4 +91,39 @@ describe('PriceCalculator', () => {
     )
     expect(await screen.findByRole('button', { name: /Đã chép/ })).toBeInTheDocument()
   })
+
+  it('đã chép rồi đổi số lượng thì nút quay về "Copy tin nhắn" (tránh dán nhầm tổng cũ)', async () => {
+    const user = userEvent.setup()
+    vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined)
+    setup()
+    await user.click(screen.getByRole('button', { name: /Copy tin nhắn/ }))
+    expect(await screen.findByRole('button', { name: /Đã chép/ })).toBeInTheDocument()
+    await user.type(screen.getByLabelText(/Số lượng IP/), '0')
+    expect(screen.queryByRole('button', { name: /Đã chép/ })).toBeNull()
+    expect(screen.getByRole('button', { name: /Copy tin nhắn/ })).toBeInTheDocument()
+  })
+
+  it('đổi loại thì giữ đúng thời hạn theo tên, kể cả khi các gói xếp khác thứ tự', async () => {
+    const user = userEvent.setup()
+    const types = [
+      proxyTypes[0],
+      { ...proxyTypes[1], plans: [proxyTypes[1].plans[2], proxyTypes[1].plans[0]] }, // chỉ có 30 ngày, 1 ngày (khác thứ tự)
+    ]
+    const { rerender } = render(<PriceCalculator types={types} selectedId="ipv4" onSelect={() => {}} links={links} />)
+    await user.selectOptions(screen.getByLabelText('Thời hạn'), 'V4-1D')
+    rerender(<PriceCalculator types={types} selectedId="ipv6" onSelect={() => {}} links={links} />)
+    expect(screen.getByLabelText('Thời hạn')).toHaveValue('V6-1D')
+    await user.selectOptions(screen.getByLabelText('Thời hạn'), 'V6-30D')
+    rerender(<PriceCalculator types={types} selectedId="ipv4" onSelect={() => {}} links={links} />)
+    expect(screen.getByLabelText('Thời hạn')).toHaveValue('V4-30D')
+  })
+
+  it('loại mới thiếu thời hạn đang chọn thì về gói phổ biến', async () => {
+    const user = userEvent.setup()
+    const types = [proxyTypes[0], { ...proxyTypes[1], plans: [proxyTypes[1].plans[0], proxyTypes[1].plans[2]] }]
+    const { rerender } = render(<PriceCalculator types={types} selectedId="ipv4" onSelect={() => {}} links={links} />)
+    await user.selectOptions(screen.getByLabelText('Thời hạn'), 'V4-7D')
+    rerender(<PriceCalculator types={types} selectedId="ipv6" onSelect={() => {}} links={links} />)
+    expect(screen.getByLabelText('Thời hạn')).toHaveValue('V6-30D')
+  })
 })

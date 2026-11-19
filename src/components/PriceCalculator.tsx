@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { calcMessageTemplate, type ProxyType } from '../data/site-data'
+import { calcMessageTemplate, type Plan, type ProxyType } from '../data/site-data'
 import type { contactLinks } from '../lib/contact-links'
 import { formatPrice } from '../lib/format-price'
 import { MAX_QUANTITY, parseQuantity, quoteMessage } from '../lib/price-calc'
@@ -12,19 +12,19 @@ type Props = {
   links: ReturnType<typeof contactLinks>
 }
 
-function popularIndex(type: ProxyType | undefined): number {
-  const i = type?.plans.findIndex((p) => p.popular) ?? -1
-  return i >= 0 ? i : 0
+function popularPlan(type: ProxyType | undefined): Plan | undefined {
+  return type?.plans.find((p) => p.popular) ?? type?.plans[0]
 }
 
 export default function PriceCalculator({ types, selectedId, onSelect, links }: Props) {
   const type = types.find((t) => t.id === selectedId) ?? types[0]
-  // Nhớ vị trí thời hạn (1/7/30 ngày) để đổi loại proxy vẫn giữ cùng thời hạn
-  const [planIndex, setPlanIndex] = useState(() => popularIndex(type))
+  // Nhớ thời hạn theo tên (vd "7 ngày") để đổi loại proxy vẫn giữ cùng thời hạn;
+  // loại mới không có thời hạn đó thì dùng gói phổ biến của loại đó
+  const [duration, setDuration] = useState(() => popularPlan(type)?.duration ?? '')
   const [qtyText, setQtyText] = useState('1')
 
-  if (!type || type.plans.length === 0) return null
-  const plan = type.plans[Math.min(planIndex, type.plans.length - 1)]
+  const plan = type?.plans.find((p) => p.duration === duration) ?? popularPlan(type)
+  if (!type || !plan) return null
   const qty = parseQuantity(qtyText)
 
   return (
@@ -45,7 +45,7 @@ export default function PriceCalculator({ types, selectedId, onSelect, links }: 
           <select
             id="calc-plan"
             value={plan.code}
-            onChange={(e) => setPlanIndex(Math.max(0, type.plans.findIndex((p) => p.code === e.target.value)))}
+            onChange={(e) => setDuration(type.plans.find((p) => p.code === e.target.value)?.duration ?? duration)}
           >
             {type.plans.map((p) => (
               <option key={p.code} value={p.code}>{p.duration}</option>
@@ -81,6 +81,7 @@ export default function PriceCalculator({ types, selectedId, onSelect, links }: 
       <div className="calc-actions">
         <a className="btn btn-zalo" href={links.zalo} target="_blank" rel="noopener noreferrer">Mua qua Zalo</a>
         <CopyMessageButton
+          key={`${plan.code}-${qtyText}`} // gói/số lượng đổi thì nút về trạng thái ban đầu, không báo "Đã chép" câu cũ
           message={qty === null ? '' : quoteMessage(calcMessageTemplate, type, plan, qty)}
           code={plan.code}
           label="📋 Copy tin nhắn"
