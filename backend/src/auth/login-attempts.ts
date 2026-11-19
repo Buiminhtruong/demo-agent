@@ -13,11 +13,23 @@ interface Attempt {
   at: number;
 }
 
+// Quét dọn toàn bộ Map nhiều nhất một lần mỗi phút (khi có reserve), để thử sai trên rất
+// nhiều email khác nhau không làm Map phình mãi. Không dùng timer.
+export const SWEEP_INTERVAL_MS = 60 * 1000;
+
 export class LoginAttempts {
   private readonly failures = new Map<string, Attempt[]>();
   private nextTicket = 1;
+  private lastSweep: number;
 
-  constructor(private readonly now: () => number = Date.now) {}
+  constructor(private readonly now: () => number = Date.now) {
+    this.lastSweep = now();
+  }
+
+  // Số email đang được theo dõi (để kiểm tra việc dọn dẹp).
+  get trackedEmails(): number {
+    return this.failures.size;
+  }
 
   isBlocked(email: string): boolean {
     return this.recent(normalizeEmail(email)).length >= MAX_FAILURES;
@@ -26,6 +38,7 @@ export class LoginAttempts {
   // Trả về vé (số duy nhất) nếu còn được thử; null nếu đang bị chặn (không ghi thêm gì,
   // để lần bị chặn không kéo dài cửa sổ).
   reserve(email: string): number | null {
+    this.sweepIfDue();
     const key = normalizeEmail(email);
     const recent = this.recent(key);
     if (recent.length >= MAX_FAILURES) return null;
@@ -48,7 +61,13 @@ export class LoginAttempts {
     this.failures.delete(normalizeEmail(email));
   }
 
-  // Trả các lần sai còn trong cửa sổ; dọn mục đã hết hạn để Map không phình mãi.
+  private sweepIfDue(): void {
+    if (this.now() - this.lastSweep < SWEEP_INTERVAL_MS) return;
+    this.lastSweep = this.now();
+    for (const key of [...this.failures.keys()]) this.recent(key);
+  }
+
+  // Trả các lần sai còn trong cửa sổ; dọn mục đã hết hạn của email này.
   private recent(key: string): Attempt[] {
     const since = this.now() - WINDOW_MS;
     const kept = (this.failures.get(key) ?? []).filter((a) => a.at > since);

@@ -65,6 +65,24 @@ describe('LoginAttempts', () => {
     expect(attempts.isBlocked('a@x.com')).toBe(false);
   });
 
+  describe('dọn bộ đếm', () => {
+    it('sai ở nhiều email khác nhau, quá 15 phút sau lần reserve kế tiếp dọn hết mục cũ', () => {
+      for (let i = 0; i < 1000; i++) attempts.reserve(`u${i}@x.com`);
+      expect(attempts.trackedEmails).toBe(1000);
+      now += 15 * MINUTE + 1;
+      attempts.reserve('khac@x.com');
+      expect(attempts.trackedEmails).toBe(1);
+    });
+
+    it('không dọn mục còn trong cửa sổ', () => {
+      failTimes('a@x.com', 5);
+      now += 2 * MINUTE;
+      attempts.reserve('b@x.com');
+      expect(attempts.trackedEmails).toBe(2);
+      expect(attempts.isBlocked('a@x.com')).toBe(true);
+    });
+  });
+
   describe('giữ chỗ (chống gửi đồng thời)', () => {
     it('các lần thử đang chạy cũng được tính: chỉ 5 lần đầu giữ được chỗ', () => {
       const results = Array.from({ length: 10 }, () =>

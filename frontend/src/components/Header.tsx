@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { startTransition, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 
@@ -9,8 +9,14 @@ export default function Header() {
 
   function onLogout() {
     setOpen(false);
-    logout();
-    navigate('/');
+    // Router đổi trang trong startTransition (v7_startTransition); nếu logout() chạy ngoài
+    // transition thì lần render user=null (ưu tiên cao) đến trước, RequireRole của trang đang
+    // mở kịp chuyển sang /dang-nhap?next=... Gộp cả hai vào cùng transition để render một lần
+    // với trang "/" và user=null.
+    startTransition(() => {
+      navigate('/');
+      logout();
+    });
   }
 
   return (
