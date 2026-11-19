@@ -6,13 +6,11 @@ import Header from './Header'
 const links = { zalo: 'https://zalo.me/900000000', telegram: 'https://t.me/x', phone: 'tel:0900' }
 
 describe('Header', () => {
-  it('có 5 link menu', () => {
+  it('có 7 link menu, đúng thứ tự các phần', () => {
     render(<Header shopName="ProxyViet" links={links} />)
-    const hrefs = ['#loai-proxy', '#bang-gia', '#cach-mua', '#hoi-dap', '#lien-he']
-    for (const h of hrefs) {
-      expect(document.querySelector(`nav a[href="${h}"]`)).not.toBeNull()
-    }
-    expect(document.querySelectorAll('nav a')).toHaveLength(5)
+    const hrefs = ['#loai-proxy', '#so-sanh', '#bang-gia', '#danh-gia', '#cach-mua', '#hoi-dap', '#lien-he']
+    const got = Array.from(document.querySelectorAll('nav a')).map((a) => a.getAttribute('href'))
+    expect(got).toEqual(hrefs)
   })
 
   it('nút Nhắn Zalo đúng link', () => {

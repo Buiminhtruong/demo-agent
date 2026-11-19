@@ -43,7 +43,7 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 .site-header { position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--line); z-index: 10; }
 .header-bar { display: flex; align-items: center; justify-content: space-between; height: 64px; }
 .logo { font-weight: 800; font-size: 20px; color: var(--primary-dark); }
-.site-header nav a { margin: 0 10px; color: var(--muted); font-size: 15px; }
+.site-header nav a { margin: 0 8px; color: var(--muted); font-size: 15px; }
 .burger { display: none; font-size: 24px; background: none; border: 0; cursor: pointer; color: var(--text); }
 
 .hero { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #fff; padding: 64px 0; }
@@ -81,6 +81,32 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 .copy-msg.failed { border-style: solid; border-color: #d97706; color: #b45309; background: #fffbeb; }
 .note { text-align: center; color: var(--muted); margin-top: 20px; font-size: 14px; }
 
+.btn-outline { background: #fff; color: var(--primary); border-color: var(--primary); padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.btn-outline:hover { background: #eff6ff; }
+.compare { width: 100%; border-collapse: separate; border-spacing: 0; background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.compare th, .compare td { padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+.compare tr:last-child td, .compare tr:last-child th { border-bottom: none; }
+.compare thead th, .compare thead td { background: #eff6ff; color: var(--primary-dark); font-size: 17px; }
+.compare tbody th { color: var(--muted); font-weight: 600; width: 22%; }
+.compare .from { display: table-cell; margin: 0; }
+.good { color: #15803d; font-weight: 600; }
+.warn { color: #b45309; font-weight: 600; }
+.cmp-cards { display: none; }
+.cmp-card h3 { margin: 0; }
+.cmp-card dl { margin: 10px 0 14px; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 15px; }
+.cmp-row { display: contents; }
+.cmp-card dt { color: var(--muted); }
+.cmp-card dd { margin: 0; }
+.cmp-card .from { display: block; margin: 0; }
+.cmp-card .btn-outline { display: block; width: 100%; text-align: center; }
+.review { display: flex; flex-direction: column; margin: 0; }
+.stars { color: #f59e0b; font-size: 18px; letter-spacing: 2px; }
+.review blockquote { flex: 1; margin: 10px 0 16px; }
+.who { display: flex; align-items: center; gap: 10px; }
+.who b, .who small { display: block; }
+.who small { color: var(--muted); }
+.avatar { flex: none; width: 40px; height: 40px; border-radius: 50%; background: #dbeafe; color: var(--primary-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .step-n { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-bottom: 10px; }
 
@@ -100,15 +126,24 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 
 .float { display: none; position: fixed; right: 16px; bottom: 16px; width: 56px; height: 56px; border-radius: 50%; background: var(--zalo); color: #fff; font-weight: 800; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,.25); font-size: 14px; }
 
-@media (max-width: 767px) {
-  .grid3, .steps, .site-footer .cols { grid-template-columns: 1fr; }
-  .header-zalo { display: none; }
+.site-header nav a { white-space: nowrap; }
+
+/* Menu 7 mục không vừa một dòng dưới ~960px → chuyển sang nút ☰ */
+@media (max-width: 959px) {
   .burger { display: block; }
   .site-header nav { display: none; position: absolute; top: 64px; left: 0; right: 0; background: #fff; border-bottom: 1px solid var(--line); flex-direction: column; padding: 8px 16px; }
   .site-header nav.open { display: flex; }
   .site-header nav a { margin: 0; padding: 12px 0; font-size: 16px; }
+  .header-zalo { margin-left: auto; margin-right: 12px; }
+}
+
+@media (max-width: 767px) {
+  .grid3, .steps, .site-footer .cols { grid-template-columns: 1fr; }
+  .header-zalo { display: none; }
   .hero { padding: 40px 0; }
   .hero h1 { font-size: 28px; }
   .hero .actions .btn { display: block; margin: 0 0 10px; text-align: center; }
   .float { display: flex; }
+  .compare { display: none; }
+  .cmp-cards { display: grid; gap: 14px; }
 }
