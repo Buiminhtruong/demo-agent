@@ -25,6 +25,17 @@ describe('Reviews', () => {
     expect(screen.getByLabelText('4 trên 5 sao')).toHaveTextContent('★★★★☆')
   })
 
+  it('số sao lẻ hoặc ngoài 1–5 được làm tròn và kẹp, không lỗi', () => {
+    const odd: Review[] = [
+      { ...items[0], rating: 4.6 },
+      { ...items[1], rating: 9 },
+      { ...items[1], text: 'x', rating: -2 },
+    ]
+    render(<Reviews items={odd} types={proxyTypes} sample={false} />)
+    expect(screen.getAllByLabelText('5 trên 5 sao')).toHaveLength(2)
+    expect(screen.getByLabelText('0 trên 5 sao')).toHaveTextContent('☆☆☆☆☆')
+  })
+
   it('dữ liệu mẫu thì hiện dòng báo, dữ liệu thật thì không', () => {
     const { rerender } = render(<Reviews items={items} types={proxyTypes} sample={true} />)
     expect(screen.getByText('Nội dung đánh giá đang là dữ liệu mẫu.')).toBeInTheDocument()

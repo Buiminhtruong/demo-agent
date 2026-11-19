@@ -88,7 +88,7 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 .compare tr:last-child td, .compare tr:last-child th { border-bottom: none; }
 .compare thead th, .compare thead td { background: #eff6ff; color: var(--primary-dark); font-size: 17px; }
 .compare tbody th { color: var(--muted); font-weight: 600; width: 22%; }
-.compare .from, .cmp-card .from { display: table-cell; margin: 0; }
+.compare .from { display: table-cell; margin: 0; }
 .good { color: #15803d; font-weight: 600; }
 .warn { color: #b45309; font-weight: 600; }
 .cmp-cards { display: none; }
@@ -97,7 +97,7 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 .cmp-row { display: contents; }
 .cmp-card dt { color: var(--muted); }
 .cmp-card dd { margin: 0; }
-.cmp-card .from { display: block; }
+.cmp-card .from { display: block; margin: 0; }
 .cmp-card .btn-outline { display: block; width: 100%; text-align: center; }
 .review { display: flex; flex-direction: column; margin: 0; }
 .stars { color: #f59e0b; font-size: 18px; letter-spacing: 2px; }
@@ -126,13 +126,20 @@ h2 { font-size: 28px; margin: 0 0 8px; text-align: center; }
 
 .float { display: none; position: fixed; right: 16px; bottom: 16px; width: 56px; height: 56px; border-radius: 50%; background: var(--zalo); color: #fff; font-weight: 800; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,.25); font-size: 14px; }
 
-@media (max-width: 767px) {
-  .grid3, .steps, .site-footer .cols { grid-template-columns: 1fr; }
-  .header-zalo { display: none; }
+.site-header nav a { white-space: nowrap; }
+
+/* Menu 7 mục không vừa một dòng dưới ~960px → chuyển sang nút ☰ */
+@media (max-width: 959px) {
   .burger { display: block; }
   .site-header nav { display: none; position: absolute; top: 64px; left: 0; right: 0; background: #fff; border-bottom: 1px solid var(--line); flex-direction: column; padding: 8px 16px; }
   .site-header nav.open { display: flex; }
   .site-header nav a { margin: 0; padding: 12px 0; font-size: 16px; }
+  .header-zalo { margin-left: auto; margin-right: 12px; }
+}
+
+@media (max-width: 767px) {
+  .grid3, .steps, .site-footer .cols { grid-template-columns: 1fr; }
+  .header-zalo { display: none; }
   .hero { padding: 40px 0; }
   .hero h1 { font-size: 28px; }
   .hero .actions .btn { display: block; margin: 0 0 10px; text-align: center; }
