@@ -28,6 +28,8 @@ export function setToken(token: string | null): void {
 
 export const SESSION_EXPIRED = 'Phiên đăng nhập đã hết, vui lòng đăng nhập lại';
 
+export const NETWORK_ERROR = 'Không kết nối được máy chủ, vui lòng kiểm tra mạng và thử lại';
+
 /**
  * AuthProvider đăng ký để xử lý 401 tập trung.
  * snapshot(): số phiên lúc gửi request; handle(snap): đăng xuất nếu phiên vẫn là snap
@@ -46,7 +48,8 @@ export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): voi
 
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
-  if (init.body !== undefined && !headers.has('Content-Type')) {
+  // FormData: để trình duyệt tự đặt Content-Type kèm boundary.
+  if (init.body !== undefined && !(init.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
   const token = getToken();
@@ -58,7 +61,13 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const handler = isLogin ? null : unauthorizedHandler;
   const snap = handler?.snapshot();
 
-  const res = await fetch(path, { ...init, headers });
+  let res: Response;
+  try {
+    res = await fetch(path, { ...init, headers });
+  } catch {
+    // Mất mạng / không tới được máy chủ: không phải phản hồi HTTP, không đụng tới nhánh 401.
+    throw new ApiError(0, NETWORK_ERROR);
+  }
   if (res.status === 401 && !isLogin) {
     if (handler && snap !== undefined) handler.handle(snap);
     throw new ApiError(401, SESSION_EXPIRED);

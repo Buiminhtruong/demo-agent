@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { PASSWORD_TOO_LONG, passwordTooLong } from '../auth/password';
+import { errorText } from '../rooms';
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -26,7 +27,7 @@ export default function RegisterPage() {
       await register({ email, password, fullName, phone, role });
       navigate('/', { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra, vui lòng thử lại');
+      setError(errorText(err));
       setBusy(false);
     }
   }

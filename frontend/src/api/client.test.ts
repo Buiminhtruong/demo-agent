@@ -36,3 +36,44 @@ describe('api: xử lý 401 tập trung', () => {
     expect(handle).not.toHaveBeenCalled();
   });
 });
+
+describe('api: mất mạng', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.unstubAllGlobals();
+  });
+
+  it('fetch bị từ chối (TypeError) → ApiError status 0 tiếng Việt, không gọi handler 401', async () => {
+    const handle = vi.fn();
+    setUnauthorizedHandler({ snapshot: () => 1, handle });
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
+    await expect(api('/api/x')).rejects.toEqual(
+      new ApiError(0, 'Không kết nối được máy chủ, vui lòng kiểm tra mạng và thử lại'),
+    );
+    expect(handle).not.toHaveBeenCalled();
+    setUnauthorizedHandler(null);
+  });
+});
+
+describe('api: Content-Type', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.unstubAllGlobals();
+  });
+
+  it('body JSON → Content-Type application/json', async () => {
+    const fetchMock = mockFetch({ 'POST /api/x': { status: 200, body: {} } });
+    await api('/api/x', { method: 'POST', body: '{}' });
+    const headers = (fetchMock.mock.calls[0][1] as RequestInit).headers as Headers;
+    expect(headers.get('Content-Type')).toBe('application/json');
+  });
+
+  it('body FormData → không tự đặt Content-Type (trình duyệt tự thêm boundary)', async () => {
+    const fetchMock = mockFetch({ 'POST /api/x': { status: 200, body: {} } });
+    const form = new FormData();
+    form.append('photos', new File(['a'], 'a.png', { type: 'image/png' }));
+    await api('/api/x', { method: 'POST', body: form });
+    const headers = (fetchMock.mock.calls[0][1] as RequestInit).headers as Headers;
+    expect(headers.has('Content-Type')).toBe(false);
+  });
+});

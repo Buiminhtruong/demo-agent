@@ -1,0 +1,80 @@
+[
+  {
+    "code": "01",
+    "name": "Thành phố Hà Nội",
+    "districts": [
+      { "code": "001", "name": "Quận Ba Đình" },
+      { "code": "002", "name": "Quận Hoàn Kiếm" },
+      { "code": "003", "name": "Quận Tây Hồ" },
+      { "code": "004", "name": "Quận Long Biên" },
+      { "code": "005", "name": "Quận Cầu Giấy" },
+      { "code": "006", "name": "Quận Đống Đa" },
+      { "code": "007", "name": "Quận Hai Bà Trưng" },
+      { "code": "008", "name": "Quận Hoàng Mai" },
+      { "code": "009", "name": "Quận Thanh Xuân" },
+      { "code": "016", "name": "Huyện Sóc Sơn" },
+      { "code": "017", "name": "Huyện Đông Anh" },
+      { "code": "018", "name": "Huyện Gia Lâm" },
+      { "code": "019", "name": "Quận Nam Từ Liêm" },
+      { "code": "020", "name": "Huyện Thanh Trì" },
+      { "code": "021", "name": "Quận Bắc Từ Liêm" },
+      { "code": "250", "name": "Huyện Mê Linh" },
+      { "code": "268", "name": "Quận Hà Đông" },
+      { "code": "269", "name": "Thị xã Sơn Tây" },
+      { "code": "271", "name": "Huyện Ba Vì" },
+      { "code": "272", "name": "Huyện Phúc Thọ" },
+      { "code": "273", "name": "Huyện Đan Phượng" },
+      { "code": "274", "name": "Huyện Hoài Đức" },
+      { "code": "275", "name": "Huyện Quốc Oai" },
+      { "code": "276", "name": "Huyện Thạch Thất" },
+      { "code": "277", "name": "Huyện Chương Mỹ" },
+      { "code": "278", "name": "Huyện Thanh Oai" },
+      { "code": "279", "name": "Huyện Thường Tín" },
+      { "code": "280", "name": "Huyện Phú Xuyên" },
+      { "code": "281", "name": "Huyện Ứng Hòa" },
+      { "code": "282", "name": "Huyện Mỹ Đức" }
+    ]
+  },
+  {
+    "code": "48",
+    "name": "Thành phố Đà Nẵng",
+    "districts": [
+      { "code": "490", "name": "Quận Liên Chiểu" },
+      { "code": "491", "name": "Quận Thanh Khê" },
+      { "code": "492", "name": "Quận Hải Châu" },
+      { "code": "493", "name": "Quận Sơn Trà" },
+      { "code": "494", "name": "Quận Ngũ Hành Sơn" },
+      { "code": "495", "name": "Quận Cẩm Lệ" },
+      { "code": "497", "name": "Huyện Hòa Vang" },
+      { "code": "498", "name": "Huyện Hoàng Sa" }
+    ]
+  },
+  {
+    "code": "79",
+    "name": "Thành phố Hồ Chí Minh",
+    "districts": [
+      { "code": "760", "name": "Quận 1" },
+      { "code": "761", "name": "Quận 12" },
+      { "code": "764", "name": "Quận Gò Vấp" },
+      { "code": "765", "name": "Quận Bình Thạnh" },
+      { "code": "766", "name": "Quận Tân Bình" },
+      { "code": "767", "name": "Quận Tân Phú" },
+      { "code": "768", "name": "Quận Phú Nhuận" },
+      { "code": "769", "name": "Thành phố Thủ Đức" },
+      { "code": "770", "name": "Quận 3" },
+      { "code": "771", "name": "Quận 10" },
+      { "code": "772", "name": "Quận 11" },
+      { "code": "773", "name": "Quận 4" },
+      { "code": "774", "name": "Quận 5" },
+      { "code": "775", "name": "Quận 6" },
+      { "code": "776", "name": "Quận 8" },
+      { "code": "777", "name": "Quận Bình Tân" },
+      { "code": "778", "name": "Quận 7" },
+      { "code": "783", "name": "Huyện Củ Chi" },
+      { "code": "784", "name": "Huyện Hóc Môn" },
+      { "code": "785", "name": "Huyện Bình Chánh" },
+      { "code": "786", "name": "Huyện Nhà Bè" },
+      { "code": "787", "name": "Huyện Cần Giờ" }
+    ]
+  }
+]

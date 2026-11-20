@@ -4,6 +4,8 @@ import RequireRole from './auth/RequireRole';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
+import MyRoomsPage from './pages/MyRoomsPage';
+import { RoomFormRoute } from './pages/RoomFormPage';
 
 // Trang chủ tạm: thay bằng trang thật ở ticket tìm phòng.
 function HomePlaceholder() {
@@ -40,6 +42,30 @@ export default function App() {
             element={
               <RequireRole roles={['tenant', 'landlord', 'admin']}>
                 <ChangePasswordPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/chu-tro/phong"
+            element={
+              <RequireRole roles={['landlord']}>
+                <MyRoomsPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/chu-tro/phong/moi"
+            element={
+              <RequireRole roles={['landlord']}>
+                <RoomFormRoute />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/chu-tro/phong/:id"
+            element={
+              <RequireRole roles={['landlord']}>
+                <RoomFormRoute />
               </RequireRole>
             }
           />

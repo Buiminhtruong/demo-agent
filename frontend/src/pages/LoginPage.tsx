@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { errorText } from '../rooms';
 
 /** Chỉ cho phép đích cùng origin (giải mã như trình duyệt, kể cả ký tự điều khiển), tránh chuyển hướng ra ngoài site. */
 export function safeNext(next: string | null): string {
@@ -34,7 +35,7 @@ export default function LoginPage() {
       await login(email, password);
       navigate(safeNext(params.get('next')), { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra, vui lòng thử lại');
+      setError(errorText(err));
       setBusy(false);
     }
   }

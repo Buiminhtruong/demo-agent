@@ -56,6 +56,15 @@ describe('LoginPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Email hoặc mật khẩu không đúng');
   });
 
+  it('mất mạng hiện thông báo tiếng Việt, không hiện lỗi của trình duyệt', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
+    setup('/dang-nhap');
+    submit();
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Không kết nối được máy chủ, vui lòng kiểm tra mạng và thử lại',
+    );
+  });
+
   it('lỗi 429 hiện thông báo thử lại sau 15 phút', async () => {
     mockFetch({
       'POST /api/auth/login': {
