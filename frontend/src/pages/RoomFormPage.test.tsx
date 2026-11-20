@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import RoomFormPage from './RoomFormPage';
+import { RoomFormRoute as RoomFormPage } from './RoomFormPage';
 import RequireRole from '../auth/RequireRole';
 import { Providers, landlord, mockFetch, type MockRoutes } from '../test-utils';
 import type { Room } from '../api/types';
@@ -41,7 +41,14 @@ const baseRoutes: MockRoutes = {
   'GET /api/locations/provinces/79/districts': { status: 200, body: districts79 },
 };
 
+let lastState: unknown = undefined;
+function StateProbe() {
+  lastState = useLocation().state;
+  return null;
+}
+
 function setup(path: string, state?: unknown) {
+  lastState = undefined;
   render(
     <Providers initialEntries={[state ? { pathname: path, state } : path] as never}>
       <Routes>
@@ -63,6 +70,7 @@ function setup(path: string, state?: unknown) {
         />
         <Route path="/chu-tro/phong" element={<p>Danh sách phòng của tôi</p>} />
       </Routes>
+      <StateProbe />
     </Providers>,
   );
 }
@@ -160,6 +168,8 @@ describe('RoomFormPage: đăng phòng mới', () => {
 
   it.each([
     ['Tiêu đề', 'abc', 'Tiêu đề từ 5 đến 120 ký tự'],
+    ['Tiêu đề', '', 'Vui lòng nhập tiêu đề'],
+    ['Tiêu đề', '   ', 'Vui lòng nhập tiêu đề'],
     ['Giá (đồng/tháng)', '0', 'Giá phải là số nguyên lớn hơn 0'],
     ['Giá (đồng/tháng)', '2000000001', 'Giá tối đa 2.000.000.000 đồng'],
     ['Diện tích (m²)', '1.5', 'Diện tích phải là số nguyên lớn hơn 0'],
@@ -183,6 +193,12 @@ describe('RoomFormPage: đăng phòng mới', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Đăng phòng' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(/^Vui lòng chọn tỉnh\/thành$/);
     expect(fetchMock.mock.calls.some((c) => c[0] === '/api/my/rooms')).toBe(false);
+  });
+
+  it('ô giá có gợi ý nhập số không dấu chấm', async () => {
+    mockFetch(baseRoutes);
+    setup('/chu-tro/phong/moi');
+    expect(await screen.findByText('Nhập số, không dấu chấm (vd 3200000)')).toBeInTheDocument();
   });
 
   it('ảnh sai định dạng / quá 5 MB / quá 10 ảnh bị từ chối ngay', async () => {
@@ -250,6 +266,20 @@ describe('RoomFormPage: sửa phòng', () => {
     expect(await screen.findByText('Phòng chưa có ảnh sẽ không hiện trên trang tìm kiếm')).toBeInTheDocument();
     expect(screen.getByText('Bị admin ẩn')).toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveTextContent('Phòng đã được lưu nhưng tải ảnh lỗi: Ảnh bị hỏng');
+  });
+
+  it('lỗi ảnh từ lúc tạo được xoá khỏi location.state (không hiện lại sau khi tải lại trang)', async () => {
+    mockFetch({ ...baseRoutes, 'GET /api/my/rooms/7': { status: 200, body: room() } });
+    setup('/chu-tro/phong/7', { photoError: 'Lỗi ảnh' });
+    expect(await screen.findByRole('alert')).toHaveTextContent('Lỗi ảnh');
+    await waitFor(() => expect(lastState).toBeNull());
+  });
+
+  it('phòng không tồn tại: có link "← Về Phòng của tôi"', async () => {
+    mockFetch(baseRoutes);
+    setup('/chu-tro/phong/99');
+    const link = await screen.findByRole('link', { name: '← Về Phòng của tôi' });
+    expect(link).toHaveAttribute('href', '/chu-tro/phong');
   });
 
   it('ảnh đầu ghi "Ảnh đại diện"; ↓ gọi PUT order; xoá ảnh gọi DELETE', async () => {

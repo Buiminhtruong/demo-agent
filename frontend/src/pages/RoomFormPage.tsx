@@ -1,5 +1,5 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client';
 import type { District, Province, Room } from '../api/types';
 import { NO_PHOTO_WARNING, errorText, statusLabels, validatePhotoFiles, validateRoom } from '../rooms';
@@ -10,6 +10,12 @@ function photoForm(files: File[]): FormData {
   const form = new FormData();
   files.forEach((f) => form.append('photos', f));
   return form;
+}
+
+// Key theo đường dẫn: sang /moi hoặc sang phòng khác thì form dựng lại từ đầu, không giữ dữ liệu cũ.
+export function RoomFormRoute() {
+  const { id } = useParams();
+  return <RoomFormPage key={id ?? 'moi'} />;
 }
 
 export default function RoomFormPage() {
@@ -31,12 +37,12 @@ export default function RoomFormPage() {
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(isEdit);
 
-  // Từ trang "đăng mới" chuyển sang trang sửa (cùng component): nhận lại lỗi ảnh và bỏ ảnh đang chờ.
+  // Lỗi ảnh chỉ hiện một lần: đã đọc vào state thì xoá khỏi location để không hiện lại sau khi tải lại trang.
   useEffect(() => {
-    setPending([]);
-    setSaved(false);
-    setPhotoError((location.state as { photoError?: string } | null)?.photoError ?? '');
-  }, [id, location.key, location.state]);
+    if ((location.state as { photoError?: string } | null)?.photoError) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.pathname, location.state, navigate]);
 
   useEffect(() => {
     let cancelled = false;
@@ -215,6 +221,9 @@ export default function RoomFormPage() {
         <div className="error" role="alert">
           {error || 'Không tìm thấy phòng'}
         </div>
+        <p>
+          <Link to="/chu-tro/phong">← Về Phòng của tôi</Link>
+        </p>
       </div>
     );
   }
@@ -249,6 +258,7 @@ export default function RoomFormPage() {
           <div className="field">
             <label htmlFor="rf-price">Giá (đồng/tháng)</label>
             <input id="rf-price" inputMode="numeric" value={fields.price} onChange={(e) => set('price', e.target.value)} />
+            <p className="note">Nhập số, không dấu chấm (vd 3200000)</p>
           </div>
           <div className="field">
             <label htmlFor="rf-area">Diện tích (m²)</label>

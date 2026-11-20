@@ -31,6 +31,7 @@ export interface RoomFields {
 /** Trả về thông báo lỗi đầu tiên, hoặc chuỗi rỗng nếu hợp lệ (cùng chữ với backend). */
 export function validateRoom(f: RoomFields): string {
   const title = f.title.trim();
+  if (!title) return 'Vui lòng nhập tiêu đề';
   if (title.length < 5 || title.length > 120) return 'Tiêu đề từ 5 đến 120 ký tự';
   if (f.description.length > 5000) return 'Mô tả tối đa 5000 ký tự';
   if (!/^\d+$/.test(f.price.trim()) || Number(f.price) < 1) return 'Giá phải là số nguyên lớn hơn 0';

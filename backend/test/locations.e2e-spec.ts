@@ -44,7 +44,10 @@ describe('Locations (e2e)', () => {
       res.body.every((d: { provinceCode: string }) => d.provinceCode === '79'),
     ).toBe(true);
     const names: string[] = res.body.map((d: { name: string }) => d.name);
-    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b, 'vi')));
+    expect(names).toEqual(
+      [...names].sort((a, b) => a.localeCompare(b, 'vi', { numeric: true })),
+    );
+    expect(names.indexOf('Quận 2')).toBeLessThan(names.indexOf('Quận 10'));
   });
 
   it('mã tỉnh không tồn tại trả 404', async () => {
