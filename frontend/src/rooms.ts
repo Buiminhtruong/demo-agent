@@ -37,7 +37,7 @@ export function validateRoom(f: RoomFields): string {
   if (Number(f.price) > 2_000_000_000) return 'Giá tối đa 2.000.000.000 đồng';
   if (!/^\d+$/.test(f.area.trim()) || Number(f.area) < 1) return 'Diện tích phải là số nguyên lớn hơn 0';
   if (Number(f.area) > 100_000) return 'Diện tích tối đa 100.000 m²';
-  if (!f.provinceCode) return 'Vui lòng chọn tỉnh/thành phố';
+  if (!f.provinceCode) return 'Vui lòng chọn tỉnh/thành';
   if (!f.districtCode) return 'Vui lòng chọn quận/huyện';
   const address = f.address.trim();
   if (!address) return 'Vui lòng nhập địa chỉ';

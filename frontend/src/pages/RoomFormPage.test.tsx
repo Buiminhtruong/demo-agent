@@ -175,6 +175,16 @@ describe('RoomFormPage: đăng phòng mới', () => {
     expect(fetchMock.mock.calls.some((c) => c[0] === '/api/my/rooms')).toBe(false);
   });
 
+  it('chưa chọn tỉnh → báo "Vui lòng chọn tỉnh/thành" (cùng chữ với server) và không gọi API', async () => {
+    const fetchMock = mockFetch(baseRoutes);
+    setup('/chu-tro/phong/moi');
+    await fillValidForm();
+    fireEvent.change(screen.getByLabelText('Tỉnh/Thành phố'), { target: { value: '' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Đăng phòng' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/^Vui lòng chọn tỉnh\/thành$/);
+    expect(fetchMock.mock.calls.some((c) => c[0] === '/api/my/rooms')).toBe(false);
+  });
+
   it('ảnh sai định dạng / quá 5 MB / quá 10 ảnh bị từ chối ngay', async () => {
     mockFetch(baseRoutes);
     setup('/chu-tro/phong/moi');
