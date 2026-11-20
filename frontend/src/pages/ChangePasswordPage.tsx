@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { api } from '../api/client';
 import { PASSWORD_TOO_LONG, passwordTooLong } from '../auth/password';
+import { errorText } from '../rooms';
 
 export default function ChangePasswordPage() {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -27,7 +28,7 @@ export default function ChangePasswordPage() {
       setNewPassword('');
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra, vui lòng thử lại');
+      setError(errorText(err));
     } finally {
       setBusy(false);
     }

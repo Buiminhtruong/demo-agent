@@ -1,3 +1,4 @@
+import { ApiError } from './api/client';
 import type { Room } from './api/types';
 
 export const MAX_PHOTOS = 10;
@@ -57,5 +58,5 @@ export function validatePhotoFiles(files: File[], existing: number): string {
 }
 
 export function errorText(err: unknown): string {
-  return err instanceof Error ? err.message : 'Có lỗi xảy ra, vui lòng thử lại';
+  return err instanceof ApiError ? err.message : 'Có lỗi xảy ra, vui lòng thử lại';
 }
