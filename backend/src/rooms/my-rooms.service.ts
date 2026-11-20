@@ -3,19 +3,28 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, EntityManager, IsNull, Repository } from 'typeorm';
 import { District } from '../locations/district.entity';
 import { Province } from '../locations/province.entity';
 import {
   CreateRoomDto,
   MyRoomDto,
+  PHOTO_ORDER_MISMATCH,
   RoomDto,
   UpdateRoomDto,
 } from './dto/room.dto';
+import {
+  detectImageExt,
+  MAX_PHOTOS,
+  PhotoStorageService,
+} from './photo-storage.service';
+import { PHOTO_MESSAGES, UploadedPhoto } from './photo-upload.interceptor';
+import { RoomPhoto } from './room-photo.entity';
 import { Room } from './room.entity';
 
 export const ROOM_NOT_FOUND = 'Không tìm thấy phòng';
+export const PHOTO_NOT_FOUND = 'Không tìm thấy ảnh';
 
 export function toRoomDto(room: Room): RoomDto {
   return {
@@ -49,6 +58,8 @@ export class MyRoomsService {
     private readonly provinces: Repository<Province>,
     @InjectRepository(District)
     private readonly districts: Repository<District>,
+    @InjectDataSource() private readonly dataSource: DataSource,
+    private readonly storage: PhotoStorageService,
   ) {}
 
   async list(ownerId: number): Promise<MyRoomDto[]> {
@@ -134,6 +145,130 @@ export class MyRoomsService {
       { deletedAt: new Date() },
     );
     if (!result.affected) throw new NotFoundException(ROOM_NOT_FOUND);
+  }
+
+  // Thêm ảnh (tất cả hoặc không): kiểm loại + tổng số trước, ghi file, rồi
+  // thêm dòng; thêm dòng hoặc commit lỗi thì xoá file vừa ghi.
+  async addPhotos(
+    ownerId: number,
+    roomId: number,
+    files: UploadedPhoto[] | undefined,
+  ): Promise<RoomDto> {
+    let written: string[] = [];
+    try {
+      await this.dataSource.transaction(async (manager) => {
+        await this.lockOwned(manager, ownerId, roomId);
+        if (!files || files.length === 0) {
+          throw new BadRequestException(PHOTO_MESSAGES.none);
+        }
+        const typed = files.map((file) => {
+          const ext = detectImageExt(file.buffer);
+          if (!ext) throw new BadRequestException(PHOTO_MESSAGES.badType);
+          return { buffer: file.buffer, ext };
+        });
+
+        const photos = manager.getRepository(RoomPhoto);
+        const existing = await photos.find({ where: { roomId } });
+        if (existing.length + typed.length > MAX_PHOTOS) {
+          throw new BadRequestException(PHOTO_MESSAGES.tooMany);
+        }
+        const start = existing.reduce(
+          (max, p) => Math.max(max, p.position + 1),
+          0,
+        );
+
+        written = await this.storage.write(typed);
+        await photos.insert(
+          written.map((filename, i) => ({
+            roomId,
+            filename,
+            position: start + i,
+          })),
+        );
+      });
+    } catch (err) {
+      await this.storage.remove(written).catch(() => undefined);
+      throw err;
+    }
+    return this.get(ownerId, roomId);
+  }
+
+  // Xoá một ảnh, đánh số lại 0..n-1, rồi xoá file (sau khi đã commit).
+  async deletePhoto(
+    ownerId: number,
+    roomId: number,
+    photoId: number,
+  ): Promise<RoomDto> {
+    const filename = await this.dataSource.transaction(async (manager) => {
+      await this.lockOwned(manager, ownerId, roomId);
+      const photos = manager.getRepository(RoomPhoto);
+      const photo = await photos.findOneBy({ id: photoId, roomId });
+      if (!photo) throw new NotFoundException(PHOTO_NOT_FOUND);
+      await photos.delete({ id: photo.id });
+      const rest = await photos.find({
+        where: { roomId },
+        order: { position: 'ASC', id: 'ASC' },
+      });
+      await this.renumber(manager, rest.map((p) => p.id), rest);
+      return photo.filename;
+    });
+    await this.storage.remove([filename]);
+    return this.get(ownerId, roomId);
+  }
+
+  // photoIds phải đúng tập ảnh hiện có của phòng (không thiếu, thừa, trùng).
+  async reorderPhotos(
+    ownerId: number,
+    roomId: number,
+    photoIds: number[],
+  ): Promise<RoomDto> {
+    await this.dataSource.transaction(async (manager) => {
+      await this.lockOwned(manager, ownerId, roomId);
+      const current = await manager
+        .getRepository(RoomPhoto)
+        .find({ where: { roomId } });
+      const ids = new Set(current.map((p) => p.id));
+      const matches =
+        photoIds.length === current.length &&
+        new Set(photoIds).size === photoIds.length &&
+        photoIds.every((id) => ids.has(id));
+      if (!matches) throw new BadRequestException(PHOTO_ORDER_MISMATCH);
+      await this.renumber(manager, photoIds, current);
+    });
+    return this.get(ownerId, roomId);
+  }
+
+  // Đặt position = vị trí trong `order`; chỉ cập nhật dòng thay đổi.
+  private async renumber(
+    manager: EntityManager,
+    order: number[],
+    photos: RoomPhoto[],
+  ): Promise<void> {
+    const positionById = new Map(photos.map((p) => [p.id, p.position]));
+    const repo = manager.getRepository(RoomPhoto);
+    for (const [index, id] of order.entries()) {
+      if (positionById.get(id) !== index) {
+        await repo.update({ id }, { position: index });
+      }
+    }
+  }
+
+  // Khoá dòng phòng (FOR UPDATE) để các thao tác ảnh đồng thời trên cùng phòng
+  // chạy lần lượt (không vượt 10 ảnh, không trùng vị trí).
+  private async lockOwned(
+    manager: EntityManager,
+    ownerId: number,
+    roomId: number,
+  ): Promise<void> {
+    const room = await manager
+      .getRepository(Room)
+      .createQueryBuilder('room')
+      .setLock('pessimistic_write')
+      .where('room.id = :roomId', { roomId })
+      .andWhere('room.ownerId = :ownerId', { ownerId })
+      .andWhere('room.deletedAt IS NULL')
+      .getOne();
+    if (!room) throw new NotFoundException(ROOM_NOT_FOUND);
   }
 
   // Một truy vấn lọc theo id + chủ + chưa xoá: phòng của người khác không

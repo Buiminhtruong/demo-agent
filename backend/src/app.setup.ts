@@ -1,4 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { uploadDir } from './rooms/photo-storage.service';
 
 // Cấu hình chung cho main.ts và test e2e.
 export function configureApp(app: INestApplication): void {
@@ -11,4 +13,13 @@ export function configureApp(app: INestApplication): void {
       stopAtFirstError: true,
     }),
   );
+  // Ảnh phòng: /uploads/<uuid>.<đuôi>. Không liệt kê thư mục, không trả dotfile,
+  // nosniff để trình duyệt không đoán loại nội dung.
+  (app as NestExpressApplication).useStaticAssets(uploadDir(), {
+    prefix: '/uploads/',
+    index: false,
+    dotfiles: 'deny',
+    redirect: false,
+    setHeaders: (res) => res.setHeader('X-Content-Type-Options', 'nosniff'),
+  });
 }

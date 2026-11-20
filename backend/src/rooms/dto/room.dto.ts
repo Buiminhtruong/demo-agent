@@ -1,6 +1,8 @@
 import { applyDecorators } from '@nestjs/common';
 import { Transform } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  IsArray,
   IsBoolean,
   IsIn,
   IsInt,
@@ -135,6 +137,15 @@ export class UpdateRoomDto {
 
   @IfPresent(rules.hiddenByOwner())
   hiddenByOwner?: boolean;
+}
+
+export const PHOTO_ORDER_MISMATCH = 'Danh sách ảnh không khớp';
+
+export class ReorderPhotosDto {
+  @IsArray({ message: PHOTO_ORDER_MISMATCH })
+  @ArrayMaxSize(100, { message: PHOTO_ORDER_MISMATCH })
+  @IsInt({ each: true, message: PHOTO_ORDER_MISMATCH })
+  photoIds: number[];
 }
 
 export interface RoomPhotoDto {
