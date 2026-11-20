@@ -36,3 +36,26 @@ describe('api: xử lý 401 tập trung', () => {
     expect(handle).not.toHaveBeenCalled();
   });
 });
+
+describe('api: Content-Type', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.unstubAllGlobals();
+  });
+
+  it('body JSON → Content-Type application/json', async () => {
+    const fetchMock = mockFetch({ 'POST /api/x': { status: 200, body: {} } });
+    await api('/api/x', { method: 'POST', body: '{}' });
+    const headers = (fetchMock.mock.calls[0][1] as RequestInit).headers as Headers;
+    expect(headers.get('Content-Type')).toBe('application/json');
+  });
+
+  it('body FormData → không tự đặt Content-Type (trình duyệt tự thêm boundary)', async () => {
+    const fetchMock = mockFetch({ 'POST /api/x': { status: 200, body: {} } });
+    const form = new FormData();
+    form.append('photos', new File(['a'], 'a.png', { type: 'image/png' }));
+    await api('/api/x', { method: 'POST', body: form });
+    const headers = (fetchMock.mock.calls[0][1] as RequestInit).headers as Headers;
+    expect(headers.has('Content-Type')).toBe(false);
+  });
+});

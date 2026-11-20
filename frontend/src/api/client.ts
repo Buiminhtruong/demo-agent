@@ -46,7 +46,8 @@ export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): voi
 
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
-  if (init.body !== undefined && !headers.has('Content-Type')) {
+  // FormData: để trình duyệt tự đặt Content-Type kèm boundary.
+  if (init.body !== undefined && !(init.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
   const token = getToken();

@@ -13,6 +13,41 @@ export interface AuthResponse {
   user: PublicUser;
 }
 
+export interface Province {
+  code: string;
+  name: string;
+}
+
+export interface District {
+  code: string;
+  name: string;
+  provinceCode: string;
+}
+
+export interface RoomPhoto {
+  id: number;
+  url: string;
+}
+
+export interface Room {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  area: number;
+  provinceCode: string;
+  provinceName: string;
+  districtCode: string;
+  districtName: string;
+  address: string;
+  status: 'available' | 'rented';
+  hiddenByOwner: boolean;
+  hiddenByAdmin: boolean;
+  photos: RoomPhoto[];
+  createdAt: string;
+  pendingAppointmentCount?: number;
+}
+
 export interface RegisterInput {
   email: string;
   password: string;
